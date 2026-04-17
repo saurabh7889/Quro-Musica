@@ -2,6 +2,7 @@ import { Outlet } from "react-router";
 import { Sidebar } from "./Sidebar";
 import { MusicPlayer } from "./MusicPlayer";
 import { QueuePanel } from "./QueuePanel";
+import { BottomNav } from "./BottomNav";
 import { UserProfile } from "./UserProfile";
 import { Toaster } from "./ui/sonner";
 
@@ -15,11 +16,13 @@ export function Layout() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px] animate-pulse delay-500" />
       </div>
 
-      {/* Left Sidebar */}
-      <Sidebar />
+      {/* Left Sidebar (Desktop Only) */}
+      <div className="hidden md:flex">
+        <Sidebar />
+      </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 relative">
+      <div className="flex-1 flex flex-col min-w-0 relative pb-[64px] md:pb-0">
         {/* Top Bar */}
         <div className="h-16 border-b border-border bg-background/20 backdrop-blur-xl flex items-center justify-end px-8 relative z-10 transition-colors duration-300">
           <UserProfile />
@@ -34,8 +37,13 @@ export function Layout() {
         <MusicPlayer />
       </div>
 
-      {/* Right Queue Panel */}
-      <QueuePanel />
+      {/* Right Queue Panel (Desktop Large Only) */}
+      <div className="hidden lg:flex z-40">
+        <QueuePanel />
+      </div>
+
+      {/* Mobile Bottom Navigation */}
+      <BottomNav />
 
       {/* Toast Notifications */}
       <Toaster />

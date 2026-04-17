@@ -9,11 +9,11 @@ import {
   Volume2,
   Heart,
   MoreHorizontal,
-  Maximize2,
-} from "lucide-react";
+import { Maximize2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Slider } from "./ui/slider";
 import { usePlayer } from "../context/PlayerContext";
+import { FullScreenPlayer } from "./FullScreenPlayer";
 
 export function MusicPlayer() {
   const {
@@ -36,6 +36,8 @@ export function MusicPlayer() {
     toggleQueueVisible
   } = usePlayer();
 
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
   const formatTime = (totalSeconds: number) => {
     if (isNaN(totalSeconds)) return "0:00";
     const minutes = Math.floor(totalSeconds / 60);
@@ -46,62 +48,94 @@ export function MusicPlayer() {
   if (!currentSong) return null;
 
   return (
-    <div className="h-24 bg-background/80 backdrop-blur-3xl border-t border-border px-8 flex items-center gap-8 relative overflow-hidden transition-all duration-300">
-      {/* Animated background glow */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-purple-500/10"
-        animate={{
-          opacity: isPlaying ? [0.4, 0.6, 0.4] : 0.2,
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+    <>
+      <AnimatePresence>
+        {isFullScreen && <FullScreenPlayer onClose={() => setIsFullScreen(false)} />}
+      </AnimatePresence>
 
-      <div className="flex items-center gap-5 w-1/4 relative z-10">
-        {/* Album Art */}
-        <motion.div
-          className="w-16 h-16 rounded-xl overflow-hidden shadow-2xl relative group"
-          whileHover={{ scale: 1.05 }}
-        >
-          <img
-            src={currentSong.albumArt}
-            alt={currentSong.album}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          />
-          {isPlaying && (
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"
-              animate={{ opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          )}
-        </motion.div>
-
-        {/* Song Info */}
-        <div className="flex-1 min-w-0">
-          <h4 className="font-bold text-foreground truncate text-base leading-tight">
-            {currentSong.title}
-          </h4>
-          <p className="text-sm text-muted-foreground font-medium truncate">{currentSong.artist}</p>
+      {/* MOBILE MINI PLAYER */}
+      <div 
+        className="md:hidden fixed bottom-[72px] left-2 right-2 h-14 bg-accent rounded-xl shadow-2xl z-50 flex items-center px-3 border border-border"
+        onClick={() => setIsFullScreen(true)}
+      >
+        <img src={currentSong.albumArt} className="w-10 h-10 rounded-lg object-cover shadow-md" alt="Album" />
+        <div className="flex-1 min-w-0 px-3">
+           <h4 className="font-bold text-foreground truncate text-sm leading-tight text-white">{currentSong.title}</h4>
+           <p className="text-xs text-muted-foreground font-medium truncate">{currentSong.artist}</p>
         </div>
-
-        {/* Like Button */}
-        <motion.button
-          whileHover={{ scale: 1.1, y: -2 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => toggleLike(currentSong.id)}
-          className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/5"
-        >
-          <Heart
-            className={`w-5 h-5 transition-all ${
-              currentSong.liked ? "fill-primary text-primary" : ""
-            }`}
-          />
-        </motion.button>
+        <div className="flex items-center gap-2">
+           <button 
+             className="text-foreground p-2" 
+             onClick={(e) => { e.stopPropagation(); togglePlayPause(); }}
+           >
+             {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
+           </button>
+           <button 
+             className="text-foreground p-2" 
+             onClick={(e) => { e.stopPropagation(); next(); }}
+           >
+             <SkipForward className="w-5 h-5 fill-current" />
+           </button>
+        </div>
       </div>
+
+      {/* DESKTOP PLAYER */}
+      <div className="hidden md:flex h-24 bg-background/80 backdrop-blur-3xl border-t border-border px-8 items-center gap-8 relative overflow-hidden transition-all duration-300">
+        {/* Animated background glow */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-purple-500/10"
+          animate={{
+            opacity: isPlaying ? [0.4, 0.6, 0.4] : 0.2,
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        <div className="flex items-center gap-5 w-1/4 relative z-10">
+          {/* Album Art */}
+          <motion.div
+            className="w-16 h-16 rounded-xl overflow-hidden shadow-2xl relative group"
+            whileHover={{ scale: 1.05 }}
+          >
+            <img
+              src={currentSong.albumArt}
+              alt={currentSong.album}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            {isPlaying && (
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"
+                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+            )}
+          </motion.div>
+
+          {/* Song Info */}
+          <div className="flex-1 min-w-0">
+            <h4 className="font-bold text-foreground truncate text-base leading-tight">
+              {currentSong.title}
+            </h4>
+            <p className="text-sm text-muted-foreground font-medium truncate">{currentSong.artist}</p>
+          </div>
+
+          {/* Like Button */}
+          <motion.button
+            whileHover={{ scale: 1.1, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => toggleLike(currentSong.id)}
+            className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/5"
+          >
+            <Heart
+              className={`w-5 h-5 transition-all ${
+                currentSong.liked ? "fill-primary text-primary" : ""
+              }`}
+            />
+          </motion.button>
+        </div>
 
       {/* Center Controls */}
       <div className="flex-1 flex flex-col items-center gap-3 relative z-10">
@@ -256,6 +290,7 @@ export function MusicPlayer() {
           <Maximize2 className="w-5 h-5" />
         </motion.button>
       </div>
-    </div>
+     </div>
+    </>
   );
 }

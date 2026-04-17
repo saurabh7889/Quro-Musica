@@ -47,17 +47,17 @@ export function Home() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-8 pb-32">
+      <div className="p-4 md:p-8 pb-32">
         {/* Greeting Section */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 md:mb-8"
         >
-          <h1 className="text-4xl font-bold mb-2">
+          <h1 className="text-2xl md:text-4xl font-bold mb-1 md:mb-2 text-foreground">
             {getGreeting()}, <span className="text-primary font-black">Saurabh</span>
           </h1>
-          <p className="text-muted-foreground">Ready to discover your next favorite song?</p>
+          <p className="text-sm md:text-base text-muted-foreground">Ready to discover your next favorite song?</p>
         </motion.div>
 
         {/* AI Playlist Generator Button */}
@@ -71,10 +71,10 @@ export function Home() {
             whileHover={{ scale: 1.01, y: -2 }}
             whileTap={{ scale: 0.99 }}
             onClick={() => setAiDialogOpen(true)}
-            className="w-full max-w-2xl p-6 rounded-3xl bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border border-primary/20 hover:border-primary/40 transition-all shadow-xl hover:shadow-primary/10 backdrop-blur-xl group overflow-hidden relative"
+            className="w-full max-w-2xl p-4 md:p-6 rounded-3xl bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border border-primary/20 hover:border-primary/40 transition-all shadow-xl hover:shadow-primary/10 backdrop-blur-xl group overflow-hidden relative"
           >
             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="flex items-center gap-5 relative z-10">
+            <div className="flex items-center gap-4 md:gap-5 relative z-10">
               <motion.div
                 animate={{
                   rotate: [0, 10, -10, 0],
@@ -85,15 +85,15 @@ export function Home() {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-                className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-emerald-600 flex items-center justify-center shadow-2xl group-hover:shadow-primary/50 transition-shadow"
+                className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-primary to-emerald-600 flex items-center justify-center shadow-2xl group-hover:shadow-primary/50 transition-shadow flex-shrink-0"
               >
-                <Sparkles className="w-8 h-8 text-primary-foreground" />
+                <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-primary-foreground" />
               </motion.div>
-              <div className="flex-1 text-left">
-                <h3 className="text-2xl font-bold text-foreground mb-1">
+              <div className="flex-1 text-left min-w-0">
+                <h3 className="text-lg md:text-2xl font-bold text-foreground mb-0.5 md:mb-1 truncate">
                   Generate AI Playlist
                 </h3>
-                <p className="text-sm text-muted-foreground font-medium">
+                <p className="text-xs md:text-sm text-muted-foreground font-medium truncate">
                   Let AI create the perfect playlist for your mood and activity
                 </p>
               </div>
@@ -115,10 +115,10 @@ export function Home() {
           transition={{ delay: 0.2 }}
           className="mb-10"
         >
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 flex items-center gap-2 text-foreground">
             Quick Access
           </h2>
-          <div className="grid grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
             {quickAccessCards.map((playlist, index) => (
               <motion.div
                 key={playlist.id}
@@ -127,13 +127,13 @@ export function Home() {
                 transition={{ delay: 0.1 * index }}
                 whileHover={{ scale: 1.02, y: -4 }}
                 onClick={() => handlePlayPlaylist(playlist)}
-                className="group relative p-4 rounded-2xl bg-card/40 hover:bg-card/60 backdrop-blur-xl border border-border hover:border-primary/30 cursor-pointer transition-all shadow-lg hover:shadow-2xl overflow-hidden"
+                className="group relative p-3 md:p-4 rounded-2xl bg-card/40 hover:bg-card/60 backdrop-blur-xl border border-border hover:border-primary/30 cursor-pointer transition-all shadow-lg hover:shadow-2xl overflow-hidden"
               >
                 {/* Hover glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 
-                <div className="relative flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-2xl">
+                <div className="relative flex items-center gap-3 md:gap-4">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-2xl">
                     <img
                       src={playlist.coverImage}
                       alt={playlist.name}
@@ -144,16 +144,16 @@ export function Home() {
                     <h3 className="font-bold text-foreground truncate">
                       {playlist.name}
                     </h3>
-                    <p className="text-sm text-muted-foreground/70 font-medium">
+                    <p className="text-xs md:text-sm text-muted-foreground/70 font-medium">
                       {playlist.songCount} songs
                     </p>
                   </div>
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     whileHover={{ opacity: 1, scale: 1 }}
-                    className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl opacity-0 group-hover:opacity-100 transition-all"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl opacity-0 group-hover:opacity-100 transition-all shrink-0"
                   >
-                    <Play className="w-6 h-6 text-primary-foreground fill-current ml-1" />
+                    <Play className="w-4 h-4 md:w-6 md:h-6 text-primary-foreground fill-current ml-1" />
                   </motion.div>
                 </div>
               </motion.div>
@@ -167,14 +167,14 @@ export function Home() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Recently Played</h2>
-            <button className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-foreground">Recently Played</h2>
+            <button className="text-xs md:text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
               Show all
             </button>
           </div>
           
-          <div className="grid grid-cols-6 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5">
             {recentlyPlayed.slice(0, 12).map((song, index) => (
               <motion.div
                 key={song.id + index}
@@ -187,9 +187,9 @@ export function Home() {
               >
                 {/* Play button overlay */}
                 <motion.div
-                  className="absolute top-24 right-6 w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10"
+                  className="absolute bottom-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10"
                 >
-                  <Play className="w-6 h-6 text-primary-foreground fill-current ml-1" />
+                  <Play className="w-4 h-4 md:w-6 md:h-6 text-primary-foreground fill-current ml-1" />
                 </motion.div>
 
                 <div className="w-full aspect-square rounded-2xl overflow-hidden mb-4 shadow-2xl">
@@ -213,16 +213,16 @@ export function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="mt-12"
+          className="mt-8 md:mt-12"
         >
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-primary" />
+          <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 md:w-6 md:h-6 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold">Recommended For You</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground">Recommended For You</h2>
           </div>
           
-          <div className="grid grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
             {playlists.slice(1, 6).map((playlist, index) => (
               <motion.div
                 key={playlist.id}
@@ -240,9 +240,9 @@ export function Home() {
 
                 {/* Play button overlay */}
                 <motion.div
-                  className="absolute top-28 right-8 w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-2xl opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10"
+                  className="absolute bottom-4 right-4 w-10 h-10 md:w-14 md:h-14 rounded-full bg-primary flex items-center justify-center shadow-2xl opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10"
                 >
-                  <Play className="w-7 h-7 text-primary-foreground fill-current ml-1" />
+                  <Play className="w-4 h-4 md:w-7 md:h-7 text-primary-foreground fill-current ml-1" />
                 </motion.div>
 
                 <div className="w-full aspect-square rounded-2xl overflow-hidden mb-4 shadow-2xl">

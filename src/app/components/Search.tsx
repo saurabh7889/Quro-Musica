@@ -67,15 +67,15 @@ export function Search() {
 
   return (
     <ScrollArea className="h-full transition-colors duration-300">
-      <div className="p-8 pb-32">
+      <div className="p-4 md:p-8 pb-32">
         {/* Search Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 md:mb-8"
         >
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-5xl font-black tracking-tight text-foreground">Search</h1>
+          <div className="flex items-center justify-between mb-4 md:mb-8">
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground">Search</h1>
             <div className="hidden md:flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
               <kbd className="px-2 py-1 rounded-lg bg-accent border border-border">⌘</kbd>
               <span>+</span>
@@ -86,13 +86,13 @@ export function Search() {
           {/* Search Bar */}
           <div className="relative max-w-3xl">
             <div className="relative group">
-              <SearchIcon className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <SearchIcon className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-5 h-5 md:w-6 md:h-6 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <Input
                 type="text"
                 placeholder="What do you want to listen to?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-16 pr-32 py-8 text-xl bg-card/40 border-border focus:border-primary/50 focus:bg-card/60 rounded-3xl backdrop-blur-2xl transition-all text-foreground placeholder:text-muted-foreground/50 shadow-2xl"
+                className="w-full pl-12 md:pl-16 pr-24 md:pr-32 py-6 md:py-8 text-base md:text-xl bg-card/40 border-border focus:border-primary/50 focus:bg-card/60 rounded-2xl md:rounded-3xl backdrop-blur-2xl transition-all text-foreground placeholder:text-muted-foreground/50 shadow-2xl"
               />
               
               <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -114,9 +114,9 @@ export function Search() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                       onClick={() => setSearchQuery("")}
-                      className="w-10 h-10 rounded-full bg-accent hover:bg-accent/80 flex items-center justify-center transition-colors"
+                      className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-accent hover:bg-accent/80 flex items-center justify-center transition-colors"
                     >
-                      <X className="w-5 h-5 text-muted-foreground" />
+                      <X className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
                     </motion.button>
                   )}
                 </AnimatePresence>
@@ -126,13 +126,13 @@ export function Search() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setIsVoiceActive(!isVoiceActive)}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                  className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all ${
                     isVoiceActive
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/40"
                       : "bg-accent hover:bg-accent/80 text-muted-foreground"
                   }`}
                 >
-                  <Mic className="w-6 h-6" />
+                  <Mic className="w-4 h-4 md:w-6 md:h-6" />
                 </motion.button>
               </div>
             </div>
@@ -159,7 +159,7 @@ export function Search() {
                   {/* Songs Results */}
                   <div>
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-bold text-foreground">Songs</h2>
+                      <h2 className="text-xl md:text-2xl font-bold text-foreground">Songs</h2>
                     </div>
                     {searchResults.length > 0 ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -171,9 +171,9 @@ export function Search() {
                             transition={{ delay: index * 0.05 }}
                             whileHover={{ scale: 1.02, x: 8 }}
                             onClick={() => playSong(song)}
-                            className="flex items-center gap-4 p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
+                            className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
                           >
-                            <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
+                            <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
                               <img
                                 src={song.albumArt}
                                 alt={song.title}
@@ -181,10 +181,10 @@ export function Search() {
                               />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-bold text-foreground truncate text-lg">
+                              <p className="font-bold text-foreground truncate text-sm md:text-lg">
                                 {song.title}
                               </p>
-                              <p className="text-sm text-muted-foreground font-medium truncate">
+                              <p className="text-xs md:text-sm text-muted-foreground font-medium truncate">
                                 {song.artist}
                               </p>
                             </div>
@@ -202,8 +202,8 @@ export function Search() {
                   {/* Playlists Results */}
                   {filteredPlaylists.length > 0 && (
                     <div>
-                      <h2 className="text-2xl font-bold text-foreground mb-6">Playlists</h2>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                      <h2 className="text-xl md:text-2xl font-bold text-foreground mb-6">Playlists</h2>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                         {filteredPlaylists.map((playlist, index) => (
                           <motion.div
                             key={playlist.id}
@@ -250,9 +250,9 @@ export function Search() {
                         transition={{ delay: index * 0.05 }}
                         whileHover={{ scale: 1.02, x: 8 }}
                         onClick={() => playSong(song)}
-                        className="flex items-center gap-4 p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
+                        className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
                       >
-                        <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
+                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
                           <img
                             src={song.albumArt}
                             alt={song.title}
@@ -260,10 +260,10 @@ export function Search() {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-foreground truncate text-lg">
+                          <p className="font-bold text-foreground truncate text-sm md:text-lg">
                             {song.title}
                           </p>
-                          <p className="text-sm text-muted-foreground font-medium truncate">
+                          <p className="text-xs md:text-sm text-muted-foreground font-medium truncate">
                             {song.artist}
                           </p>
                         </div>
@@ -276,7 +276,7 @@ export function Search() {
                 </TabsContent>
 
                 <TabsContent value="playlists">
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                     {filteredPlaylists.map((playlist, index) => (
                       <motion.div
                         key={playlist.id}
@@ -313,8 +313,8 @@ export function Search() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <h2 className="text-3xl font-black tracking-tight mb-8 text-foreground">Browse Categories</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <h2 className="text-2xl md:text-3xl font-black tracking-tight mb-8 text-foreground">Browse Categories</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
                 {categories.map((category, index) => (
                   <motion.div
                     key={category.name}

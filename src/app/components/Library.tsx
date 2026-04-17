@@ -38,7 +38,7 @@ export function Library() {
 
   return (
     <ScrollArea className="h-full transition-colors duration-300">
-      <div className="p-8 pb-32">
+      <div className="p-4 md:p-8 pb-32">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -46,7 +46,7 @@ export function Library() {
           className="mb-8"
         >
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-5xl font-black tracking-tight text-foreground">Your Library</h1>
+            <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground">Your Library</h1>
             
             {/* View Toggle */}
             <div className="flex items-center gap-2 p-1 rounded-2xl bg-accent border border-border">
@@ -97,7 +97,7 @@ export function Library() {
           {/* Playlists Tab */}
           <TabsContent value="playlists">
             {viewMode === "grid" ? (
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                 {playlists.map((playlist, index) => (
                   <motion.div
                     key={playlist.id}
@@ -139,9 +139,9 @@ export function Library() {
                     transition={{ delay: index * 0.05 }}
                     whileHover={{ scale: 1.01, x: 8 }}
                     onClick={() => handlePlayPlaylist(playlist)}
-                    className="flex items-center gap-4 p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
+                    className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
                   >
-                    <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
+                    <div className="w-14 h-14 md:w-20 md:h-20 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
                       <img
                         src={playlist.coverImage}
                         alt={playlist.name}
@@ -149,10 +149,10 @@ export function Library() {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-foreground text-lg truncate">
+                      <p className="font-bold text-foreground text-sm md:text-lg truncate">
                         {playlist.name}
                       </p>
-                      <p className="text-sm text-muted-foreground font-medium truncate">
+                      <p className="text-xs md:text-sm text-muted-foreground font-medium truncate">
                         {playlist.description || `${playlist.songCount} songs`}
                       </p>
                     </div>
@@ -171,19 +171,19 @@ export function Library() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8 p-10 rounded-3xl bg-gradient-to-br from-purple-600/20 to-pink-600/10 border border-purple-500/20 backdrop-blur-xl relative overflow-hidden"
+              className="mb-8 p-6 md:p-10 rounded-3xl bg-gradient-to-br from-purple-600/20 to-pink-600/10 border border-purple-500/20 backdrop-blur-xl relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[80px] -translate-y-1/2 translate-x-1/2 rounded-full" />
-              <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
-                <div className="w-48 h-48 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-2xl rotate-3 group-hover:rotate-0 transition-transform duration-500">
-                  <Heart className="w-24 h-24 text-white fill-white animate-pulse" />
+              <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 relative z-10">
+                <div className="w-32 h-32 md:w-48 md:h-48 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-2xl rotate-3 group-hover:rotate-0 transition-transform duration-500 flex-shrink-0">
+                  <Heart className="w-16 h-16 md:w-24 md:h-24 text-white fill-white animate-pulse" />
                 </div>
                 <div className="text-center md:text-left">
-                  <p className="text-xs font-black text-purple-500 uppercase tracking-[0.2em] mb-3">
+                  <p className="text-[10px] md:text-xs font-black text-purple-500 uppercase tracking-[0.2em] mb-2 md:mb-3">
                     Your Collection
                   </p>
-                  <h2 className="text-6xl font-black mb-4 text-foreground tracking-tight">Liked Songs</h2>
-                  <p className="text-muted-foreground font-medium text-lg">
+                  <h2 className="text-4xl md:text-6xl font-black mb-2 md:mb-4 text-foreground tracking-tight">Liked Songs</h2>
+                  <p className="text-muted-foreground font-medium text-sm md:text-lg">
                     {likedSongs.length} songs • Your favorite tracks all in one place
                   </p>
                 </div>
@@ -200,10 +200,10 @@ export function Library() {
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ scale: 1.01, x: 8 }}
                   onClick={() => playSong(song)}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
+                  className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
                 >
-                  <span className="text-muted-foreground/40 font-black w-8 text-center text-xs">{index + 1}</span>
-                  <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
+                  <span className="text-muted-foreground/40 font-black w-6 md:w-8 text-center text-xs hidden md:block">{index + 1}</span>
+                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
                     <img
                       src={song.albumArt}
                       alt={song.title}
@@ -211,8 +211,8 @@ export function Library() {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-foreground truncate text-lg">{song.title}</p>
-                    <p className="text-sm text-muted-foreground font-medium truncate">{song.artist}</p>
+                    <p className="font-bold text-foreground truncate text-sm md:text-lg">{song.title}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground font-medium truncate">{song.artist}</p>
                   </div>
                   <p className="text-sm text-muted-foreground/60 truncate max-w-[200px] hidden md:block">
                     {song.album}
@@ -240,9 +240,9 @@ export function Library() {
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ scale: 1.01, x: 8 }}
                   onClick={() => playSong(song)}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
+                  className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
                 >
-                  <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
+                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
                     <img
                       src={song.albumArt}
                       alt={song.title}
@@ -250,12 +250,12 @@ export function Library() {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-foreground truncate text-lg">{song.title}</p>
-                    <p className="text-sm text-muted-foreground font-medium truncate">
+                    <p className="font-bold text-foreground truncate text-sm md:text-lg">{song.title}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground font-medium truncate">
                       {song.artist}
                     </p>
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-primary/60 px-3 py-1 rounded-full bg-primary/5">Recently</span>
+                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-primary/60 px-2 md:px-3 py-1 rounded-full bg-primary/5 hidden md:block">Recently</span>
                   <span className="text-xs font-bold text-muted-foreground/40 w-12 text-right">{song.duration}</span>
                 </motion.div>
               ))}
