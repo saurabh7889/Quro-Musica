@@ -35,8 +35,11 @@ export function BottomNav() {
               <motion.div
                 animate={isActive ? {
                   scale: [1, 1.15, 1],
-                  filter: ["blur(0px)", "blur(0px)", "blur(0px)"],
-                  dropShadow: "0 0 10px rgba(29,185,84,0.4)"
+                  filter: [
+                    "drop-shadow(0 0 0px rgba(29,185,84,0))",
+                    "drop-shadow(0 0 8px rgba(29,185,84,0.4))",
+                    "drop-shadow(0 0 4px rgba(29,185,84,0.2))"
+                  ]
                 } : {}}
                 transition={{ duration: 0.4 }}
               >
