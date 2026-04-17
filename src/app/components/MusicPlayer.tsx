@@ -55,30 +55,51 @@ export function MusicPlayer() {
       </AnimatePresence>
 
       {/* MOBILE MINI PLAYER */}
-      <div
-        className="md:hidden fixed bottom-[72px] left-2 right-2 h-14 bg-accent rounded-xl shadow-2xl z-50 flex items-center px-3 border border-border"
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="md:hidden fixed bottom-[84px] left-3 right-3 h-16 bg-card/60 backdrop-blur-3xl rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] z-50 flex items-center px-4 border border-white/10 group active:scale-95 transition-all"
         onClick={() => setIsFullScreen(true)}
       >
-        <img src={currentSong.albumArt} className="w-10 h-10 rounded-lg object-cover shadow-md" alt="Album" />
-        <div className="flex-1 min-w-0 px-3">
-          <h4 className="font-bold truncate text-sm leading-tight text-white">{currentSong.title}</h4>
-          <p className="text-xs text-muted-foreground font-medium truncate">{currentSong.artist}</p>
+        <div className="relative w-11 h-11 flex-shrink-0">
+          <img src={currentSong.albumArt} className="w-full h-full rounded-xl object-cover shadow-lg group-hover:rotate-3 transition-transform" alt="Album" />
+          {isPlaying && (
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-primary rounded-full border-2 border-background flex items-center justify-center">
+               <div className="w-1.5 h-1.5 bg-background rounded-full animate-ping" />
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-2">
-          <button
+        
+        <div className="flex-1 min-w-0 px-4">
+          <h4 className="font-black text-foreground truncate text-[13px] leading-tight text-white mb-0.5">{currentSong.title}</h4>
+          <p className="text-[11px] text-muted-foreground font-bold truncate uppercase tracking-wider">{currentSong.artist}</p>
+        </div>
+        
+        <div className="flex items-center gap-1">
+          <motion.button
+            whileTap={{ scale: 0.8 }}
             className="text-foreground p-2"
             onClick={(e) => { e.stopPropagation(); togglePlayPause(); }}
           >
-            {isPlaying ? <Pause className="w-5 h-5 fill-current text-white" /> : <Play className="w-5 h-5 fill-current ml-0.5 text-white" />}
-          </button>
-          <button
+            {isPlaying ? <Pause className="w-6 h-6 fill-current text-primary" /> : <Play className="w-6 h-6 fill-current ml-0.5 text-primary" />}
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.8 }}
             className="text-foreground p-2"
             onClick={(e) => { e.stopPropagation(); next(); }}
           >
-            <SkipForward className="w-5 h-5 fill-current text-white" />
-          </button>
+            <SkipForward className="w-6 h-6 fill-current text-white/80" />
+          </motion.button>
         </div>
-      </div>
+
+        {/* Mini progress line at top of pill */}
+        <div className="absolute top-0 left-4 right-4 h-[2px] bg-white/5 overflow-hidden rounded-full">
+           <motion.div 
+             className="h-full bg-primary shadow-[0_0_10px_rgba(29,185,84,0.8)]"
+             style={{ width: `${(currentTime / (duration || 30)) * 100}%` }}
+           />
+        </div>
+      </motion.div>
 
       {/* DESKTOP PLAYER */}
       <div className="hidden md:flex h-24 bg-background/80 backdrop-blur-3xl border-t border-border px-8 items-center gap-8 relative overflow-hidden transition-all duration-300">

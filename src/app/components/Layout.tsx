@@ -24,8 +24,17 @@ export function Layout() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 relative pb-[64px] md:pb-0">
         {/* Top Bar */}
-        <div className="h-16 border-b border-border bg-background/20 backdrop-blur-xl flex items-center justify-end px-8 relative z-10 transition-colors duration-300">
-          <UserProfile />
+        <div className="h-16 border-b border-border bg-background/20 backdrop-blur-xl flex items-center justify-between px-4 md:px-8 relative z-10 transition-colors duration-300">
+          {/* Mobile Branding */}
+          <div className="md:hidden">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
+              Quro Música
+            </h1>
+          </div>
+          
+          <div className="ml-auto">
+            <UserProfile />
+          </div>
         </div>
 
         {/* Content */}
