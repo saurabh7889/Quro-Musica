@@ -55,7 +55,7 @@ export function Home() {
           className="mb-6 md:mb-8"
         >
           <h1 className="text-2xl md:text-4xl font-bold mb-1 md:mb-2 text-foreground">
-            {getGreeting()}, <span className="text-primary font-black">Saurabh</span>
+            {getGreeting()}, <span className="text-primary font-black">User</span>
           </h1>
           <p className="text-sm md:text-base text-muted-foreground">Ready to discover your next favorite song?</p>
         </motion.div>

@@ -24,7 +24,7 @@ export function UserProfile() {
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-emerald-600 flex items-center justify-center shadow-lg group-hover:shadow-[0_0_15px_rgba(29,185,84,0.4)] transition-shadow">
             <User className="w-4 h-4 text-primary-foreground" />
           </div>
-          <span className="font-medium text-foreground text-sm">Saurabh</span>
+          <span className="font-medium text-foreground text-sm">User</span>
           <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
         </motion.button>
       </DropdownMenuTrigger>
