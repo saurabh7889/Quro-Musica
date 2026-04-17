@@ -1,7 +1,7 @@
 import { mockSongs, mockPlaylists, recentlyPlayed } from './data/mockData';
 
-// Use environment variable for production, default to localhost for development
-const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
+// Use environment variable for production, default to Render backend
+const API_URL = import.meta.env.VITE_API_URL || 'https://quromusic.onrender.com/api';
 
 console.info(`[api] Initialized with BASE_URL: ${API_URL}`);
 if (window.location.protocol === 'https:' && API_URL.startsWith('http:')) {
