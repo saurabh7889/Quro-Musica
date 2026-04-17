@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { mockSongs, mockPlaylists, recentlyPlayed } from './data/mockData';
 
 // Use environment variable for production, default to Render backend
