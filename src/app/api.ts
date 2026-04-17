@@ -1,6 +1,12 @@
 import { mockSongs, mockPlaylists, recentlyPlayed } from './data/mockData';
 
-const API_URL = 'http://localhost:5001/api';
+// Use environment variable for production, default to localhost for development
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
+
+console.info(`[api] Initialized with BASE_URL: ${API_URL}`);
+if (window.location.protocol === 'https:' && API_URL.startsWith('http:')) {
+  console.warn('[api] SECURITY WARNING: Mixed Content detected. Calling HTTP API from HTTPS site. This will likely fail on mobile browsers!');
+}
 
 // Re-export types so components can import { Song, Playlist, ArtistProfile } from '../api'
 export type { Song, Playlist, ArtistProfile } from './data/mockData';
@@ -11,14 +17,32 @@ export type { Song, Playlist, ArtistProfile } from './data/mockData';
  */
 async function safeFetch(url: string, options?: RequestInit): Promise<Response> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 4000); // 4s timeout
+  const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout for mobile networks
+  
+  console.log(`[api] Requesting: ${url}`, options ? { method: options.method } : '');
+  const startTime = Date.now();
+
   try {
     const res = await fetch(url, { ...options, signal: controller.signal });
+    const duration = Date.now() - startTime;
     clearTimeout(timeout);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    console.log(`[api] Response Received: ${res.status} (${duration}ms)`);
+    
+    if (!res.ok) {
+       const errBody = await res.text().catch(() => 'No error body');
+       throw new Error(`HTTP ${res.status}: ${errBody}`);
+    }
     return res;
-  } catch (err) {
+  } catch (err: any) {
     clearTimeout(timeout);
+    const duration = Date.now() - startTime;
+    
+    if (err.name === 'AbortError') {
+      console.error(`[api] Request Timed Out after ${duration}ms: ${url}`);
+    } else {
+      console.error(`[api] Fetch failed after ${duration}ms:`, err.message || err);
+    }
     throw err;
   }
 }

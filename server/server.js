@@ -18,6 +18,12 @@ const LASTFM_API_KEY = process.env.LASTFM_API_KEY;
 app.use(cors());
 app.use(express.json());
 
+// Request logging middleware for debugging mobile connectivity
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - IP: ${req.ip}`);
+  next();
+});
+
 // Helper to format JioSaavn tracks to our Song interface
 const formatJioSaavnTrack = (track) => {
   // Find highest quality image

@@ -23,25 +23,38 @@ export function Search() {
 
   // Debounced search logic
   useEffect(() => {
-    if (!searchQuery.trim()) {
+    const trimmedQuery = searchQuery.trim();
+    
+    console.group(`[Search] Flow: "${trimmedQuery}"`);
+    console.log(`Input Length: ${trimmedQuery.length}`);
+
+    if (trimmedQuery.length < 2) {
+      console.log('Query too short, clearing results.');
       setSearchResults([]);
       setIsSearching(false);
+      console.groupEnd();
       return;
     }
 
     const timer = setTimeout(async () => {
       setIsSearching(true);
+      console.log(`Triggering API Search Music for: "${trimmedQuery}"`);
+      
       try {
-        const results = await api.searchMusic(searchQuery);
+        const results = await api.searchMusic(trimmedQuery);
+        console.log(`Results received: ${results.length} songs found.`);
         setSearchResults(results);
-      } catch (err) {
-        console.error("Search failed:", err);
+      } catch (err: any) {
+        console.error("Search API Execution Failed:", err);
       } finally {
         setIsSearching(false);
+        console.groupEnd();
       }
     }, 500);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [searchQuery]);
 
   const filteredPlaylists = allPlaylists.filter((playlist) =>
