@@ -9,19 +9,23 @@ import { usePlayer } from "../context/PlayerContext";
 export function Home() {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [recentlyPlayed, setRecentlyPlayed] = useState<Song[]>([]);
+  const [trendingSongs, setTrendingSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
-  const { playSong, playPlaylist } = usePlayer();
+  const { playSong, playPlaylist, recentlyPlayed: realHistory } = usePlayer();
 
   useEffect(() => {
     Promise.all([api.getPlaylists(), api.getRecentlyPlayed()])
-      .then(([pl, rp]) => {
+      .then(([pl, trending]) => {
         setPlaylists(pl);
-        setRecentlyPlayed(rp);
+        setTrendingSongs(trending);
         setLoading(false);
       })
       .catch(console.error);
   }, []);
+
+  // Display real history if available, otherwise show trending/demo data
+  const songsToDisplay = realHistory.length > 0 ? realHistory : trendingSongs;
+  const sectionTitle = realHistory.length > 0 ? "Recently Played" : "Trending Now";
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -174,21 +178,21 @@ export function Home() {
           </div>
         </motion.div>
 
-        {/* Recently Played Section (Last.fm Top Tracks) */}
+        {/* Recently Played Section (Real history or Trending) */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
           <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h2 className="text-xl md:text-2xl font-bold text-foreground">Recently Played</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground">{sectionTitle}</h2>
             <button className="text-xs md:text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
               Show all
             </button>
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5">
-            {recentlyPlayed.slice(0, 12).map((song, index) => (
+            {songsToDisplay.slice(0, 12).map((song, index) => (
               <motion.div
                 key={song.id + index}
                 initial={{ opacity: 0, scale: 0.9 }}

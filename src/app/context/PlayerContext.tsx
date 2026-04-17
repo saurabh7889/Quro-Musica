@@ -42,6 +42,7 @@ interface PlayerContextType {
   toggleShuffle: () => void;
   toggleRepeat: () => void;
   addToQueue: (song: Song) => void;
+  recentlyPlayed: Song[];
   isQueueVisible: boolean;
   toggleQueueVisible: () => void;
 }
@@ -64,6 +65,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState(0); // 0: off (next), 1: all (cycle), 2: one (loop)
   const [allSongs, setAllSongs] = useState<Song[]>([]);
+  const [recentlyPlayed, setRecentlyPlayed] = useState<Song[]>(() => {
+    const saved = localStorage.getItem('player-history');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isQueueVisible, setIsQueueVisible] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -210,6 +215,16 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           }
         });
       }
+      
+      // Update recently played history
+      if (currentSong) {
+        setRecentlyPlayed(prev => {
+          const filtered = prev.filter(s => s.id !== currentSong.id);
+          const updated = [currentSong, ...filtered].slice(0, 20);
+          localStorage.setItem('player-history', JSON.stringify(updated));
+          return updated;
+        });
+      }
     } else {
       audio.pause();
     }
@@ -303,6 +318,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         toggleShuffle,
         toggleRepeat,
         addToQueue,
+        recentlyPlayed,
         isQueueVisible,
         toggleQueueVisible
       }}
