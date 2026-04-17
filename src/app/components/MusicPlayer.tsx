@@ -298,6 +298,7 @@ export function MusicPlayer() {
           <motion.button
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.9 }}
+            onClick={() => setIsFullScreen(true)}
             className="text-muted-foreground hover:text-foreground transition-all p-2 hover:bg-accent rounded-full"
           >
             <Maximize2 className="w-5 h-5" />

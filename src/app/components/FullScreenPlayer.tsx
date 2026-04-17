@@ -1,5 +1,5 @@
 import { motion, useDragControls } from "motion/react";
-import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Heart, ChevronDown } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Heart, ChevronDown, Volume2 } from "lucide-react";
 import { Slider } from "./ui/slider";
 import { usePlayer } from "../context/PlayerContext";
 import { useEffect, useState } from "react";
@@ -21,6 +21,8 @@ export function FullScreenPlayer({ onClose }: Props) {
     next,
     previous,
     seek,
+    setVolume,
+    volume,
     toggleLike,
     toggleShuffle,
     toggleRepeat,
@@ -135,7 +137,20 @@ export function FullScreenPlayer({ onClose }: Props) {
           <button onClick={toggleRepeat} className={`p-3 relative ${repeatMode > 0 ? 'text-primary' : 'text-white/60'}`}>
             <Repeat className="w-6 h-6" />
             {repeatMode === 2 && <div className="absolute top-1 right-2 w-1.5 h-1.5 bg-primary rounded-full" />}
+            {repeatMode === 1 && <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1 bg-primary rounded-full" />}
           </button>
+        </div>
+
+        {/* Volume control in full screen */}
+        <div className="flex items-center gap-4 px-2 pt-4 opacity-70">
+           <Volume2 className="w-5 h-5 text-white/50" />
+           <Slider
+             value={[volume]}
+             onValueChange={(val) => setVolume(val[0])}
+             max={100}
+             step={1}
+             className="flex-1"
+           />
         </div>
       </div>
 
