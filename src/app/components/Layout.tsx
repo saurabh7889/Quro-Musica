@@ -8,7 +8,7 @@ import { Toaster } from "./ui/sonner";
 
 export function Layout() {
   return (
-    <div className="h-screen w-screen bg-background text-foreground overflow-hidden flex transition-colors duration-300">
+    <div className="h-screen w-full max-w-full bg-background text-foreground overflow-x-hidden overflow-y-auto flex transition-colors duration-300 relative">
       {/* Animated background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] animate-pulse" />
