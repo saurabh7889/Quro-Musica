@@ -154,6 +154,7 @@ export function Library() {
                 </motion.button>
               </div>
             </div>
+          </motion.div>
 
           <Tabs defaultValue="playlists" className="w-full">
             <div className="relative -mx-4 md:mx-0 px-4 md:px-0 overflow-x-auto scrollbar-hide mb-8">
