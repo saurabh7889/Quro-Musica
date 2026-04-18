@@ -11,6 +11,7 @@ export function Home() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [trendingSongs, setTrendingSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
   const { playSong, playPlaylist, recentlyPlayed: realHistory } = usePlayer();
 
   useEffect(() => {
@@ -26,6 +27,10 @@ export function Home() {
   // Display real history if available, otherwise show trending/demo data
   const songsToDisplay = realHistory.length > 0 ? realHistory : trendingSongs;
   const sectionTitle = realHistory.length > 0 ? "Recently Played" : "Trending Now";
+  
+  // Show 4 songs initially, 10 if expanded
+  const historyLimit = isHistoryExpanded ? 10 : 4;
+  const visibleHistory = songsToDisplay.slice(0, historyLimit);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -186,13 +191,18 @@ export function Home() {
         >
           <div className="flex items-center justify-between mb-4 md:mb-6">
             <h2 className="text-xl md:text-2xl font-bold text-foreground">{sectionTitle}</h2>
-            <button className="text-xs md:text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
-              Show all
-            </button>
+            {songsToDisplay.length > 4 && (
+              <button 
+                onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
+                className="text-xs md:text-sm font-semibold text-primary hover:text-primary/80 transition-colors px-3 py-1 rounded-full bg-primary/10 hover:bg-primary/20"
+              >
+                {isHistoryExpanded ? "Show Less" : `Show ${Math.min(6, songsToDisplay.length - 4)} more`}
+              </button>
+            )}
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5">
-            {songsToDisplay.slice(0, 12).map((song, index) => (
+            {visibleHistory.map((song, index) => (
               <motion.div
                 key={song.id + index}
                 initial={{ opacity: 0, scale: 0.9 }}
