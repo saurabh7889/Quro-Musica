@@ -1,3 +1,9 @@
+import { Home, Search, Library, Plus, Heart } from "lucide-react";
+import { Link, useLocation } from "react-router";
+import { motion } from "motion/react";
+import { useState, useEffect } from "react";
+import { api, Playlist } from "../api";
+import { ScrollArea } from "./ui/scroll-area";
 import { usePlayer } from "../context/PlayerContext";
 import { PlaylistContextMenu } from "./PlaylistContextMenu";
 
