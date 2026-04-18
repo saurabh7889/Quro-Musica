@@ -14,12 +14,6 @@ export function Library() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   // ... (existing states)
   
-  // Auto-open playlist from navigation state
-  useEffect(() => {
-    if (location.state?.openPlaylist && playlists.length > 0) {
-      handleOpenPlaylist(location.state.openPlaylist);
-    }
-  }, [location.state, playlists]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [songs, setSongs] = useState<Song[]>([]);
   const [recentSongs, setRecentSongs] = useState<Song[]>([]);
@@ -111,6 +105,13 @@ export function Library() {
         playPlaylist(fetchedSongs.slice(0, playlist.songCount));
      }
   };
+
+  // Auto-open playlist from navigation state
+  useEffect(() => {
+    if (location.state?.openPlaylist && playlists.length > 0) {
+      handleOpenPlaylist(location.state.openPlaylist);
+    }
+  }, [location.state, playlists, handleOpenPlaylist]);
 
   return (
     <div className="flex-1 relative overflow-hidden h-full">
