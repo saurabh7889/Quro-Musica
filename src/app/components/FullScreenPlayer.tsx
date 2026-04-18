@@ -73,9 +73,9 @@ export function FullScreenPlayer({ onClose }: Props) {
       </div>
 
       {/* Artwork Container */}
-      <div className="w-full flex justify-center px-8 z-10 relative mt-0 py-4">
+      <div className="w-full flex justify-center px-8 z-10 relative mt-4 py-8">
         <motion.div 
-          className="w-full aspect-square max-w-[280px] md:max-w-sm rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+          className="w-full aspect-square max-w-sm rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
           animate={{ scale: isPlaying ? 1 : 0.95 }}
           transition={{ duration: 0.5 }}
         >
@@ -84,16 +84,16 @@ export function FullScreenPlayer({ onClose }: Props) {
       </div>
 
       {/* Primary Controls */}
-      <div className="px-8 pb-10 z-10 relative flex flex-col space-y-4 md:space-y-6 mt-4">
+      <div className="px-8 pb-10 z-10 relative flex flex-col space-y-6 mt-6">
         
         {/* Title & Like */}
         <div className="flex justify-between items-center">
           <div className="flex-1 min-w-0 pr-4">
-            <h1 className="text-xl md:text-2xl font-black text-white truncate">{currentSong.title}</h1>
-            <p className="text-base md:text-lg text-white/70 font-medium truncate mt-0.5">{currentSong.artist}</p>
+            <h1 className="text-2xl font-black text-white truncate">{currentSong.title}</h1>
+            <p className="text-lg text-white/70 font-medium truncate mt-1">{currentSong.artist}</p>
           </div>
           <button onClick={() => toggleLike(currentSong.id)} className="p-2">
-            <Heart className={`w-6 h-6 md:w-7 md:h-7 ${currentSong.liked ? "fill-primary text-primary" : "text-white/70"}`} />
+            <Heart className={`w-7 h-7 ${currentSong.liked ? "fill-primary text-primary" : "text-white/70"}`} />
           </button>
         </div>
 

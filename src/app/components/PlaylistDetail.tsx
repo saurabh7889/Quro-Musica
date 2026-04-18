@@ -73,7 +73,7 @@ export function PlaylistDetail({ playlist, onBack }: Props) {
       <ScrollArea className="h-full">
         {/* Immersive Header */}
         <div 
-          className="relative min-h-[25vh] md:h-[45vh] flex items-end p-4 md:p-12 overflow-hidden"
+          className="relative h-[30vh] md:h-[45vh] flex items-end p-6 md:p-12 overflow-hidden"
           style={{ 
             background: `linear-gradient(to bottom, ${playlist.id === 'liked' ? '#5038a0' : '#454545'} 0%, var(--background) 110%)` 
           }}
@@ -81,30 +81,30 @@ export function PlaylistDetail({ playlist, onBack }: Props) {
           {/* Back Button */}
           <button 
             onClick={onBack}
-            className="absolute top-4 left-4 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white transition-colors z-30"
+            className="absolute top-6 left-6 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white transition-colors z-30"
           >
-            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+            <ChevronLeft className="w-6 h-6" />
           </button>
 
-          <div className="flex flex-col md:flex-row items-center md:items-end gap-4 md:gap-10 relative z-20 w-full pt-12 md:pt-0">
+          <div className="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-10 relative z-20 w-full">
             <motion.div 
                layoutId={`playlist-art-${playlist.id}`}
-               className="w-32 h-32 md:w-64 md:h-64 rounded-xl md:rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden flex-shrink-0"
+               className="w-48 h-48 md:w-64 md:h-64 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden flex-shrink-0"
             >
               <img src={playlist.coverImage} className="w-full h-full object-cover" alt="" />
             </motion.div>
             
             <div className="flex-1 text-center md:text-left text-white">
-              <p className="text-[9px] md:text-xs font-black uppercase tracking-[0.3em] mb-1 md:mb-4 drop-shadow-lg opacity-80">Public Playlist</p>
-              <h1 className="text-3xl md:text-8xl font-black tracking-tighter mb-2 md:mb-6 drop-shadow-2xl truncate leading-none">
+              <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] mb-2 md:mb-4 drop-shadow-lg">Public Playlist</p>
+              <h1 className="text-4xl md:text-8xl font-black tracking-tighter mb-4 md:mb-6 drop-shadow-2xl truncate leading-none">
                 {playlist.name}
               </h1>
-              <div className="flex items-center justify-center md:justify-start gap-2 text-[10px] md:text-sm font-bold text-white/80 drop-shadow-lg">
+              <div className="flex items-center justify-center md:justify-start gap-2 text-sm font-bold text-white/80 drop-shadow-lg">
                 <span className="text-white">Quro Música</span>
-                <span className="opacity-40">•</span>
+                <span>•</span>
                 <span>{playlist.songCount} songs</span>
-                <span className="hidden md:inline opacity-40">•</span>
-                <span className="hidden md:inline opacity-60">About 45 min</span>
+                <span>•</span>
+                <span className="opacity-60">About 45 min</span>
               </div>
             </div>
           </div>
@@ -153,12 +153,12 @@ export function PlaylistDetail({ playlist, onBack }: Props) {
         <div className="px-6 md:px-12 mb-20 overflow-x-auto">
           <table className="w-full text-left border-separate border-spacing-y-0 min-w-[600px]">
             <thead>
-              <tr className="text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground/60 border-b border-white/10">
-                <th className="py-3 px-2 md:px-4 font-black w-8 md:w-12">#</th>
-                <th className="py-3 px-2 md:px-4 font-black">Title</th>
-                <th className="py-3 px-4 font-black hidden md:table-cell">Album</th>
-                <th className="py-3 px-4 font-black hidden lg:table-cell">Date Added</th>
-                <th className="py-3 px-2 md:px-4 font-black text-right"><Clock className="w-4 h-4 ml-auto" /></th>
+              <tr className="text-xs uppercase tracking-widest text-muted-foreground/60 border-b border-white/10">
+                <th className="py-3 px-4 font-black w-12">#</th>
+                <th className="py-3 px-4 font-black">Title</th>
+                <th className="py-3 px-4 font-black">Album</th>
+                <th className="py-3 px-4 font-black">Date Added</th>
+                <th className="py-3 px-4 font-black text-right"><Clock className="w-4 h-4 ml-auto" /></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -168,31 +168,31 @@ export function PlaylistDetail({ playlist, onBack }: Props) {
                   onClick={() => playSong(song)}
                   className="group hover:bg-white/5 transition-colors cursor-pointer"
                 >
-                  <td className="py-3 px-2 md:px-4 text-[10px] md:text-sm font-medium text-muted-foreground/40 text-center">
+                  <td className="py-3 px-4 text-sm font-medium text-muted-foreground/40 text-center">
                     {currentSong?.id === song.id && isPlaying ? (
-                       <div className="w-3 md:w-4 h-3 md:h-4 flex items-center justify-center mx-auto">
-                          <div className="w-0.5 md:w-1 bg-primary h-2 md:h-3 mx-0.5 animate-bounce" />
-                          <div className="w-0.5 md:w-1 bg-primary h-3 md:h-4 mx-0.5 animate-bounce [animation-delay:0.2s]" />
-                          <div className="w-0.5 md:w-1 bg-primary h-1.5 md:h-2 mx-0.5 animate-bounce [animation-delay:0.1s]" />
+                       <div className="w-4 h-4 flex items-center justify-center mx-auto">
+                          <div className="w-1 bg-primary h-3 mx-0.5 animate-bounce" />
+                          <div className="w-1 bg-primary h-4 mx-0.5 animate-bounce [animation-delay:0.2s]" />
+                          <div className="w-1 bg-primary h-2 mx-0.5 animate-bounce [animation-delay:0.1s]" />
                        </div>
                     ) : index + 1}
                   </td>
-                  <td className="py-3 px-2 md:px-4">
-                    <div className="flex items-center gap-3 md:gap-4">
-                      <img src={song.albumArt} className="w-8 h-8 md:w-10 md:h-10 rounded-lg shadow-lg flex-shrink-0" alt="" />
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-4">
+                      <img src={song.albumArt} className="w-10 h-10 rounded-lg shadow-lg" alt="" />
                       <div className="min-w-0">
-                        <p className={`font-bold truncate text-xs md:text-sm ${currentSong?.id === song.id ? 'text-primary' : 'text-white'}`}>{song.title}</p>
-                        <p className="text-[10px] md:text-xs text-muted-foreground truncate font-medium">{song.artist}</p>
+                        <p className={`font-bold truncate text-sm ${currentSong?.id === song.id ? 'text-primary' : 'text-white'}`}>{song.title}</p>
+                        <p className="text-xs text-muted-foreground truncate font-medium">{song.artist}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="py-3 px-4 text-sm text-muted-foreground/80 font-medium truncate max-w-[150px] hidden md:table-cell">
+                  <td className="py-3 px-4 text-sm text-muted-foreground/80 font-medium truncate max-w-[150px]">
                     {song.album}
                   </td>
-                  <td className="py-3 px-4 text-sm text-muted-foreground/60 font-medium hidden lg:table-cell">
+                  <td className="py-3 px-4 text-sm text-muted-foreground/60 font-medium">
                     5 days ago
                   </td>
-                  <td className="py-3 px-2 md:px-4 text-[10px] md:text-xs font-mono text-muted-foreground/40 text-right">
+                  <td className="py-3 px-4 text-xs font-mono text-muted-foreground/40 text-right">
                     {song.duration}
                   </td>
                 </tr>
