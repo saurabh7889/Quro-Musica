@@ -176,7 +176,7 @@ export function Search() {
                     </div>
                     {searchResults.length > 0 ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {searchResults.slice(0, 8).map((song, index) => (
+                        {searchResults.slice(0, 20).map((song, index) => (
                           <motion.div
                             key={song.id + index}
                             initial={{ opacity: 0, x: -20 }}
@@ -209,6 +209,20 @@ export function Search() {
                       </div>
                     ) : !isSearching && (
                       <p className="text-muted-foreground/60 italic">Searching real-time music...</p>
+                    )}
+                    {searchResults.length > 20 && (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                           const tabsList = document.querySelector('[role="tablist"]');
+                           const songsTab = tabsList?.querySelector('[data-value="songs"]') as HTMLElement;
+                           songsTab?.click();
+                        }}
+                        className="w-full mt-6 py-4 rounded-2xl bg-accent/30 hover:bg-accent/50 text-sm font-bold text-primary transition-all border border-dashed border-primary/20"
+                      >
+                        See all {searchResults.length} results
+                      </motion.button>
                     )}
                   </div>
 

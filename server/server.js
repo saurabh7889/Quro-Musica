@@ -82,7 +82,7 @@ app.get('/api/playlists', (req, res) => {
 app.get('/api/recently-played', async (req, res) => {
   // Using popular query for "Recently Played"
   try {
-    const response = await axios.get(`https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=trending+pop&limit=12`);
+    const response = await axios.get(`https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=trending+pop&limit=24`);
     const tracks = response.data.data.results;
     const formatted = tracks.map(formatJioSaavnTrack);
     res.json(formatted);
@@ -99,7 +99,7 @@ app.get('/api/music/search', async (req, res) => {
     if (!query) return res.json([]);
     
     // JioSaavn provides full audio streaming urls & 500x500 album art
-    const response = await axios.get(`https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=${encodeURIComponent(query)}&limit=20`);
+    const response = await axios.get(`https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=${encodeURIComponent(query)}&limit=50`);
     const tracks = response.data.data.results || [];
     
     const formatted = tracks.map(formatJioSaavnTrack);
