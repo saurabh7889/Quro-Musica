@@ -52,7 +52,7 @@ export function Home() {
   // Recommendations Logic
   const recsLimit = isRecsExpanded ? 10 : 4;
   const visibleRecs = recommendedSongs.slice(0, recsLimit);
-  const recsTitle = JSON.parse(localStorage.getItem('quro_search_history') || '[]').length > 0 
+  const recsTitle = JSON.parse(localStorage.getItem('quro_search_history') || '[]').length > 0
     ? `Since you searched for "${JSON.parse(localStorage.getItem('quro_search_history') || '[]')[0]}"`
     : "Recommended For You";
 
@@ -66,12 +66,12 @@ export function Home() {
   const quickAccessCards = playlists.slice(0, 6);
 
   const handlePlayPlaylist = async (playlist: Playlist) => {
-     // In a real app we'd fetch the songs for this playlist
-     // For this prototype, if it's "Liked Songs", we could fetch all liked songs
-     // Otherwise just fetch some songs to play
-     const allSongs = await api.getSongs();
-     const plSongs = allSongs.slice(0, playlist.songCount);
-     playPlaylist(plSongs);
+    // In a real app we'd fetch the songs for this playlist
+    // For this prototype, if it's "Liked Songs", we could fetch all liked songs
+    // Otherwise just fetch some songs to play
+    const allSongs = await api.getSongs();
+    const plSongs = allSongs.slice(0, playlist.songCount);
+    playPlaylist(plSongs);
   };
 
   if (loading) {
@@ -102,7 +102,7 @@ export function Home() {
         >
           {/* Vibrant Aura Glow */}
           <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-purple-600/30 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
-          
+
           <motion.button
             whileHover={{ scale: 1.01, y: -4 }}
             whileTap={{ scale: 0.98 }}
@@ -133,19 +133,19 @@ export function Home() {
             >
               <Sparkles className="w-8 h-8 md:w-10 md:h-10 text-primary-foreground" />
             </motion.div>
-            
+
             <div className="flex-1 text-left min-w-0 relative z-10">
               <div className="flex items-center gap-2 mb-1">
-                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] px-2 py-0.5 bg-primary/10 rounded-full border border-primary/20">Magic AI</span>
-                 <h3 className="text-xl md:text-3xl font-black text-foreground tracking-tight truncate">
-                   Generate Playlist
-                 </h3>
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] px-2 py-0.5 bg-primary/10 rounded-full border border-primary/20">Magic AI</span>
+                <h3 className="text-xl md:text-3xl font-black text-foreground tracking-tight truncate">
+                  Generate Playlist
+                </h3>
               </div>
               <p className="text-sm md:text-base text-muted-foreground font-medium leading-relaxed max-w-md">
                 Let our AI understand your mood and craft the ultimate sonic journey just for you.
               </p>
             </div>
-            
+
             <motion.div
               animate={{ x: [0, 8, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
@@ -178,7 +178,7 @@ export function Home() {
                 className="group relative p-3 md:p-4 rounded-2xl bg-card/30 hover:bg-card/50 backdrop-blur-3xl border border-white/5 hover:border-primary/30 cursor-pointer transition-all shadow-xl hover:shadow-primary/10 overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                
+
                 <div className="relative flex items-center gap-4">
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden flex-shrink-0 shadow-2xl border border-white/5">
                     <img
@@ -215,7 +215,7 @@ export function Home() {
           <div className="flex items-center justify-between mb-4 md:mb-6">
             <h2 className="text-xl md:text-2xl font-bold text-foreground">{historyTitle}</h2>
             {historyToDisplay.length > 4 && (
-              <button 
+              <button
                 onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
                 className="text-xs md:text-sm font-semibold text-primary hover:text-primary/80 transition-colors px-3 py-1 rounded-full bg-primary/10 hover:bg-primary/20"
               >
@@ -223,7 +223,7 @@ export function Home() {
               </button>
             )}
           </div>
-          
+
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5">
             {visibleHistory.map((song, index) => (
               <motion.div
@@ -272,7 +272,7 @@ export function Home() {
               <h2 className="text-xl md:text-2xl font-bold text-foreground">{recsTitle}</h2>
             </div>
             {recommendedSongs.length > 4 && (
-              <button 
+              <button
                 onClick={() => setIsRecsExpanded(!isRecsExpanded)}
                 className="text-xs md:text-sm font-semibold text-primary hover:text-primary/80 transition-colors px-3 py-1 rounded-full bg-primary/10 hover:bg-primary/20"
               >
@@ -280,7 +280,7 @@ export function Home() {
               </button>
             )}
           </div>
-          
+
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5">
             {visibleRecs.map((song, index) => (
               <motion.div
@@ -316,7 +316,7 @@ export function Home() {
               </motion.div>
             ))}
           </div>
-        </motion.div>v>
+        </motion.div>
       </div>
 
       <AIPlaylistGenerator open={aiDialogOpen} onOpenChange={setAiDialogOpen} />
