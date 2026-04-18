@@ -123,89 +123,58 @@ export function Library() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-10"
         >
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-            <div className="flex-1 min-w-0">
-               <h1 className="text-3xl md:text-6xl font-black tracking-tight text-foreground mb-2">
-                 Your <span className="text-primary italic">Library</span>
-               </h1>
-               <p className="text-sm md:text-base text-muted-foreground font-medium">Manage your collection, playlists and favorite tracks.</p>
-            </div>
-            
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Search Bar */}
-              <div className="relative group flex-1 md:flex-none md:w-64">
-                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Search in library..."
-                  value={librarySearch}
-                  onChange={(e) => setLibrarySearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 text-sm bg-card/40 border border-border focus:border-primary/50 focus:bg-card/60 rounded-xl outline-none transition-all text-white"
-                />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 mb-8">
+              <div className="flex-1 min-w-0">
+                 <h1 className="text-3xl md:text-6xl font-black tracking-tighter text-foreground mb-1 md:mb-2">
+                   Your <span className="text-primary italic">Library</span>
+                 </h1>
+                 <p className="text-[10px] md:text-base text-muted-foreground font-medium uppercase tracking-[0.2em] md:normal-case md:tracking-normal opacity-60 md:opacity-100">Curation • Collection • Discovery</p>
               </div>
+              
+              <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto">
+                <div className="relative group flex-1 md:w-64">
+                  <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <input
+                    type="text"
+                    placeholder="Search library..."
+                    value={librarySearch}
+                    onChange={(e) => setLibrarySearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 text-sm bg-card/40 border border-border focus:border-primary/50 focus:bg-card/60 rounded-xl outline-none transition-all text-white h-11 md:h-10"
+                  />
+                </div>
 
-              {/* Create Playlist Button */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all text-sm"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Create</span>
-              </motion.button>
-
-              {/* View Toggle */}
-              <div className="flex items-center gap-1 p-1 rounded-xl bg-accent/50 border border-border">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setViewMode("grid")}
-                  className={`p-1.5 rounded-lg transition-all ${
-                    viewMode === "grid"
-                      ? "bg-card text-primary shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => api.createPlaylist("New Playlist").then(fetchPlaylists)}
+                  className="bg-primary text-black px-4 md:px-6 py-2.5 md:py-2 rounded-xl flex items-center gap-2 font-black text-xs md:text-sm shadow-lg shadow-primary/20 flex-shrink-0"
                 >
-                  <Grid className="w-4 h-4" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setViewMode("list")}
-                  className={`p-1.5 rounded-lg transition-all ${
-                    viewMode === "list"
-                      ? "bg-card text-primary shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <List className="w-4 h-4" />
+                  <Plus className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="hidden sm:inline">Create</span>
                 </motion.button>
               </div>
             </div>
-          </div>
-        </motion.div>
 
-        <Tabs defaultValue="playlists" className="w-full">
-          <TabsList className="bg-card/40 border border-border mb-8 p-1 rounded-2xl">
-            <TabsTrigger value="playlists" className="rounded-xl px-6 py-2">
-              <Music className="w-4 h-4 mr-2" />
-              Playlists
-            </TabsTrigger>
-            <TabsTrigger value="liked" className="rounded-xl px-6 py-2">
-              <Heart className="w-4 h-4 mr-2" />
-              Liked Songs
-            </TabsTrigger>
-            <TabsTrigger value="recent" className="rounded-xl px-6 py-2">
-              <Clock className="w-4 h-4 mr-2" />
-              Recent
-            </TabsTrigger>
-          </TabsList>
+          <Tabs defaultValue="playlists" className="w-full">
+            <div className="relative -mx-4 md:mx-0 px-4 md:px-0 overflow-x-auto scrollbar-hide mb-8">
+              <TabsList className="bg-white/5 border border-white/10 p-1 md:p-1.5 rounded-2xl md:rounded-[2rem] h-auto flex-nowrap w-max min-w-full md:min-w-0 md:inline-flex">
+                <TabsTrigger value="playlists" className="rounded-xl md:rounded-[1.5rem] px-6 md:px-8 py-2 md:py-3 text-xs md:text-sm font-black data-[state=active]:bg-primary data-[state=active]:text-black transition-all">
+                  <Music className="w-4 h-4 mr-2" /> Playlists
+                </TabsTrigger>
+                <TabsTrigger value="liked" className="rounded-xl md:rounded-[1.5rem] px-6 md:px-8 py-2 md:py-3 text-xs md:text-sm font-black data-[state=active]:bg-primary data-[state=active]:text-black transition-all">
+                  <Heart className="w-4 h-4 mr-2" /> Liked Songs
+                </TabsTrigger>
+                <TabsTrigger value="recent" className="rounded-xl md:rounded-[1.5rem] px-6 md:px-8 py-2 md:py-3 text-xs md:text-sm font-black data-[state=active]:bg-primary data-[state=active]:text-black transition-all">
+                  <Clock className="w-4 h-4 mr-2" /> Recent
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
           {/* Playlists Tab */}
           <TabsContent value="playlists">
             {filteredPlaylists.length > 0 ? (
-              viewMode === "grid" ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+              <TabsContent value="playlists" className="mt-0 outline-none">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-8 min-h-[400px]">
                   {filteredPlaylists.map((playlist, index) => (
                     <motion.div
                       key={playlist.id}
@@ -292,31 +261,31 @@ export function Library() {
               animate={{ opacity: 1, y: 0 }}
               onClick={() => handleOpenPlaylist('liked')}
               onContextMenu={(e) => handleContextMenu(e, 'liked')}
-              className="mb-8 p-6 md:p-12 rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-purple-600/10 to-transparent border border-white/5 backdrop-blur-3xl relative overflow-hidden group/header cursor-pointer"
+              className="mb-8 p-6 md:p-12 rounded-[2rem] md:rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-purple-600/10 to-transparent border border-white/5 backdrop-blur-3xl relative overflow-hidden group/header cursor-pointer"
             >
-              <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[100px] -translate-y-1/2 translate-x-1/2 rounded-full animate-pulse" />
-              <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
+              <div className="absolute top-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-primary/10 blur-[80px] md:blur-[100px] -translate-y-1/2 translate-x-1/2 rounded-full animate-pulse" />
+              <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12 relative z-10">
                 <div className="relative">
-                    <div className="w-32 h-32 md:w-56 md:h-56 rounded-[2.5rem] bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-[0_0_50px_rgba(29,185,84,0.3)] rotate-3 group-hover/header:rotate-0 transition-transform duration-700 flex-shrink-0">
-                    <Heart className="w-16 h-16 md:w-28 md:h-28 text-white fill-white animate-pulse" />
+                    <div className="w-24 h-24 md:w-56 md:h-56 rounded-[1.5rem] md:rounded-[2.5rem] bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-[0_0_50px_rgba(29,185,84,0.3)] rotate-3 group-hover/header:rotate-0 transition-transform duration-700 flex-shrink-0">
+                    <Heart className="w-12 h-12 md:w-28 md:h-28 text-white fill-white animate-pulse" />
                     </div>
                     <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={() => playPlaylist(likedSongs)}
-                        className="absolute -bottom-4 -right-4 w-16 h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl hover:bg-primary hover:text-white transition-colors border-4 border-black/10"
+                        onClick={(e) => { e.stopPropagation(); playPlaylist(likedSongs); }}
+                        className="absolute -bottom-2 -right-2 md:-bottom-4 md:-right-4 w-12 h-12 md:w-16 md:h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl hover:bg-primary hover:text-white transition-colors border-4 border-black/10"
                     >
-                        <Play className="w-7 h-7 fill-current ml-1" />
+                        <Play className="w-5 h-5 md:w-7 md:h-7 fill-current ml-1" />
                     </motion.button>
                 </div>
                 
                 <div className="text-center md:text-left">
-                  <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                      <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] px-3 py-1 bg-primary/10 rounded-full border border-primary/20">Collection</span>
+                  <div className="flex items-center justify-center md:justify-start gap-2 mb-2 md:mb-4">
+                      <span className="text-[8px] md:text-[10px] font-black text-primary uppercase tracking-[0.3em] px-2 md:px-3 py-0.5 md:py-1 bg-primary/10 rounded-full border border-primary/20">Collection</span>
                   </div>
-                  <h2 className="text-4xl md:text-7xl font-black mb-3 text-foreground tracking-tighter">Liked Songs</h2>
-                  <p className="text-muted-foreground font-medium text-sm md:text-xl max-w-md">
-                    {likedSongs.length} unique tracks saved by you. Your personal sonic vault.
+                  <h2 className="text-3xl md:text-7xl font-black mb-1 md:mb-3 text-white tracking-tighter">Liked Songs</h2>
+                  <p className="text-white/60 font-medium text-xs md:text-xl max-w-md">
+                    {likedSongs.length} tracks • Your personal sonic vault.
                   </p>
                 </div>
               </div>
