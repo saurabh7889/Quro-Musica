@@ -54,15 +54,7 @@ export function FullScreenPlayer({ onClose }: Props) {
       animate={{ y: 0 }}
       exit={{ y: "100%" }}
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
-      drag="y"
-      dragConstraints={{ top: 0, bottom: 0 }}
-      dragElastic={0.2}
-      onDragEnd={(e, { offset, velocity }) => {
-        if (offset.y > 150 || velocity.y > 500) {
-          onClose(); // Swipe down to close
-        }
-      }}
-      className="fixed inset-0 z-[100] bg-background md:hidden flex flex-col pt-safe overflow-y-auto"
+      className="fixed inset-0 z-[100] bg-background md:hidden overflow-y-auto pt-safe scrollbar-hide"
     >
       {/* Background blur */}
       <div 
@@ -81,7 +73,7 @@ export function FullScreenPlayer({ onClose }: Props) {
       </div>
 
       {/* Artwork Container */}
-      <div className="flex-1 w-full flex items-center justify-center px-8 z-10 relative mt-4 max-h-[40vh]">
+      <div className="w-full flex justify-center px-8 z-10 relative mt-4 py-8">
         <motion.div 
           className="w-full aspect-square max-w-sm rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
           animate={{ scale: isPlaying ? 1 : 0.95 }}
