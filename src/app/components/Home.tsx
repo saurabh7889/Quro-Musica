@@ -23,11 +23,36 @@ export function Home() {
         setPlaylists(pl);
         setTrendingSongs(trending);
 
-        // Personalized Recommendations Logic
+        // Real-time Genre Analysis for Recommendations
         const history = JSON.parse(localStorage.getItem('quro_search_history') || '[]');
         if (history.length > 0) {
-          // Use the most recent search term to get relevant songs
-          const recs = await api.searchMusic(history[0]);
+          // Analyze search keywords to find the most frequent genre/interest
+          const stopWords = new Set(['song', 'songs', 'new', 'mp3', 'lyrics', 'best', 'hits', '2024', 'remix', 'video', 'full']);
+          const wordsBuffer: string[] = [];
+          
+          history.forEach((q: string) => {
+            q.toLowerCase().split(/\s+/).forEach(word => {
+              if (word.length > 2 && !stopWords.has(word)) {
+                wordsBuffer.push(word);
+              }
+            });
+          });
+
+          // Find the most frequent word in the history
+          const freqMap: Record<string, number> = {};
+          let favoriteKeyword = history[0]; // Default to latest search
+          let maxFreq = 0;
+
+          wordsBuffer.forEach(word => {
+            freqMap[word] = (freqMap[word] || 0) + 1;
+            if (freqMap[word] > maxFreq) {
+              maxFreq = freqMap[word];
+              favoriteKeyword = word;
+            }
+          });
+
+          console.log(`[Recommendations] Analyzing history. Dominant keyword: "${favoriteKeyword}"`);
+          const recs = await api.searchMusic(favoriteKeyword);
           setRecommendedSongs(recs);
         } else {
           // Fallback to trending
@@ -292,10 +317,6 @@ export function Home() {
                 onClick={() => playSong(song)}
                 className="group p-4 rounded-3xl bg-card/40 hover:bg-card/60 backdrop-blur-xl border border-border hover:border-primary/20 cursor-pointer transition-all shadow-lg hover:shadow-2xl relative"
               >
-                <div className="absolute top-3 right-3 z-20 px-3 py-1 rounded-full bg-primary/90 backdrop-blur-xl shadow-lg">
-                  <span className="text-[10px] font-black text-primary-foreground uppercase tracking-widest">Personalized</span>
-                </div>
-
                 <motion.div
                   className="absolute bottom-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10"
                 >
