@@ -41,6 +41,13 @@ export function Search() {
           index === self.findIndex((t) => t.id === s.id)
         );
         setSearchResults(uniqueResults);
+
+        // Save keyword for personalization if results found
+        if (uniqueResults.length > 0) {
+          const history = JSON.parse(localStorage.getItem('quro_search_history') || '[]');
+          const newHistory = [trimmedQuery, ...history.filter((q: string) => q !== trimmedQuery)].slice(0, 5);
+          localStorage.setItem('quro_search_history', JSON.stringify(newHistory));
+        }
       } catch (err: any) {
         console.error("Search API Execution Failed:", err);
       } finally {

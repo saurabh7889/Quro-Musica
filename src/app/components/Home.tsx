@@ -10,27 +10,51 @@ export function Home() {
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [trendingSongs, setTrendingSongs] = useState<Song[]>([]);
+  const [recommendedSongs, setRecommendedSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
+  const [isRecsExpanded, setIsRecsExpanded] = useState(false);
   const { playSong, playPlaylist, recentlyPlayed: realHistory } = usePlayer();
 
   useEffect(() => {
-    Promise.all([api.getPlaylists(), api.getRecentlyPlayed()])
-      .then(([pl, trending]) => {
+    const loadData = async () => {
+      try {
+        const [pl, trending] = await Promise.all([api.getPlaylists(), api.getRecentlyPlayed()]);
         setPlaylists(pl);
         setTrendingSongs(trending);
+
+        // Personalized Recommendations Logic
+        const history = JSON.parse(localStorage.getItem('quro_search_history') || '[]');
+        if (history.length > 0) {
+          // Use the most recent search term to get relevant songs
+          const recs = await api.searchMusic(history[0]);
+          setRecommendedSongs(recs);
+        } else {
+          // Fallback to trending
+          setRecommendedSongs(trending);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
         setLoading(false);
-      })
-      .catch(console.error);
+      }
+    };
+
+    loadData();
   }, []);
 
-  // Display real history if available, otherwise show trending/demo data
-  const songsToDisplay = realHistory.length > 0 ? realHistory : trendingSongs;
-  const sectionTitle = realHistory.length > 0 ? "Recently Played" : "Trending Now";
-  
-  // Show 4 songs initially, 10 if expanded
+  // Recently Played Logic
+  const historyToDisplay = realHistory.length > 0 ? realHistory : trendingSongs;
+  const historyTitle = realHistory.length > 0 ? "Recently Played" : "Trending Now";
   const historyLimit = isHistoryExpanded ? 10 : 4;
-  const visibleHistory = songsToDisplay.slice(0, historyLimit);
+  const visibleHistory = historyToDisplay.slice(0, historyLimit);
+
+  // Recommendations Logic
+  const recsLimit = isRecsExpanded ? 10 : 4;
+  const visibleRecs = recommendedSongs.slice(0, recsLimit);
+  const recsTitle = JSON.parse(localStorage.getItem('quro_search_history') || '[]').length > 0 
+    ? `Since you searched for "${JSON.parse(localStorage.getItem('quro_search_history') || '[]')[0]}"`
+    : "Recommended For You";
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -182,7 +206,6 @@ export function Home() {
             ))}
           </div>
         </motion.div>
-
         {/* Recently Played Section (Real history or Trending) */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -190,13 +213,13 @@ export function Home() {
           transition={{ delay: 0.3 }}
         >
           <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h2 className="text-xl md:text-2xl font-bold text-foreground">{sectionTitle}</h2>
-            {songsToDisplay.length > 4 && (
+            <h2 className="text-xl md:text-2xl font-bold text-foreground">{historyTitle}</h2>
+            {historyToDisplay.length > 4 && (
               <button 
                 onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
                 className="text-xs md:text-sm font-semibold text-primary hover:text-primary/80 transition-colors px-3 py-1 rounded-full bg-primary/10 hover:bg-primary/20"
               >
-                {isHistoryExpanded ? "Show Less" : `Show ${Math.min(6, songsToDisplay.length - 4)} more`}
+                {isHistoryExpanded ? "Show Less" : `Show ${Math.min(6, historyToDisplay.length - 4)} more`}
               </button>
             )}
           </div>
@@ -212,7 +235,6 @@ export function Home() {
                 onClick={() => playSong(song)}
                 className="group p-4 rounded-3xl bg-card/40 hover:bg-card/60 backdrop-blur-xl border border-border hover:border-primary/20 cursor-pointer transition-all shadow-lg hover:shadow-2xl relative"
               >
-                {/* Play button overlay */}
                 <motion.div
                   className="absolute bottom-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10"
                 >
@@ -235,60 +257,66 @@ export function Home() {
           </div>
         </motion.div>
 
-        {/* Smart Recommendations */}
+        {/* Smart Recommendations (Personalized Songs) */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
           className="mt-8 md:mt-12"
         >
-          <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 md:w-6 md:h-6 text-primary" />
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 md:w-6 md:h-6 text-primary" />
+              </div>
+              <h2 className="text-xl md:text-2xl font-bold text-foreground">{recsTitle}</h2>
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-foreground">Recommended For You</h2>
+            {recommendedSongs.length > 4 && (
+              <button 
+                onClick={() => setIsRecsExpanded(!isRecsExpanded)}
+                className="text-xs md:text-sm font-semibold text-primary hover:text-primary/80 transition-colors px-3 py-1 rounded-full bg-primary/10 hover:bg-primary/20"
+              >
+                {isRecsExpanded ? "Show Less" : `Show ${Math.min(6, recommendedSongs.length - 4)} more`}
+              </button>
+            )}
           </div>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-            {playlists.slice(1, 6).map((playlist, index) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5">
+            {visibleRecs.map((song, index) => (
               <motion.div
-                key={playlist.id}
+                key={song.id + index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 * index }}
                 whileHover={{ scale: 1.05, y: -8 }}
-                onClick={() => handlePlayPlaylist(playlist)}
-                className="group p-5 rounded-3xl bg-card/40 hover:bg-card/60 backdrop-blur-xl border border-border hover:border-primary/20 cursor-pointer transition-all shadow-lg hover:shadow-2xl relative"
+                onClick={() => playSong(song)}
+                className="group p-4 rounded-3xl bg-card/40 hover:bg-card/60 backdrop-blur-xl border border-border hover:border-primary/20 cursor-pointer transition-all shadow-lg hover:shadow-2xl relative"
               >
-                {/* AI Tag */}
                 <div className="absolute top-3 right-3 z-20 px-3 py-1 rounded-full bg-primary/90 backdrop-blur-xl shadow-lg">
-                  <span className="text-[10px] font-black text-primary-foreground uppercase tracking-widest">AI</span>
+                  <span className="text-[10px] font-black text-primary-foreground uppercase tracking-widest">Personalized</span>
                 </div>
 
-                {/* Play button overlay */}
                 <motion.div
-                  className="absolute bottom-4 right-4 w-10 h-10 md:w-14 md:h-14 rounded-full bg-primary flex items-center justify-center shadow-2xl opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10"
+                  className="absolute bottom-4 right-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary flex items-center justify-center shadow-2xl opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 z-10"
                 >
-                  <Play className="w-4 h-4 md:w-7 md:h-7 text-primary-foreground fill-current ml-1" />
+                  <Play className="w-4 h-4 md:w-6 md:h-6 text-primary-foreground fill-current ml-1" />
                 </motion.div>
 
                 <div className="w-full aspect-square rounded-2xl overflow-hidden mb-4 shadow-2xl">
                   <img
-                    src={playlist.coverImage}
-                    alt={playlist.name}
+                    src={song.albumArt}
+                    alt={song.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                 </div>
-                <h3 className="font-bold text-foreground text-base truncate mb-1">
-                  {playlist.name}
+                <h3 className="font-bold text-foreground text-sm truncate mb-1">
+                  {song.title}
                 </h3>
-                <p className="text-xs text-muted-foreground font-medium truncate line-clamp-2">
-                  {playlist.description || `${playlist.songCount} songs`}
-                </p>
+                <p className="text-xs text-muted-foreground font-medium truncate">{song.artist}</p>
               </motion.div>
             ))}
           </div>
-        </motion.div>
+        </motion.div>v>
       </div>
 
       <AIPlaylistGenerator open={aiDialogOpen} onOpenChange={setAiDialogOpen} />
