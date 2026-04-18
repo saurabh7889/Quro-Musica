@@ -96,10 +96,13 @@ app.get('/api/recently-played', async (req, res) => {
 app.get('/api/music/search', async (req, res) => {
   try {
     const query = req.query.q;
+    const page = req.query.page || 0;
+    const limit = req.query.limit || 20;
+
     if (!query) return res.json([]);
     
     // JioSaavn provides full audio streaming urls & 500x500 album art
-    const response = await axios.get(`https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=${encodeURIComponent(query)}&limit=50`);
+    const response = await axios.get(`https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
     const tracks = response.data.data.results || [];
     
     const formatted = tracks.map(formatJioSaavnTrack);

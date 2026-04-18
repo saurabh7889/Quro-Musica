@@ -11,6 +11,9 @@ export function Search() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Song[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const [allPlaylists, setAllPlaylists] = useState<Playlist[]>([]);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const { playSong, playPlaylist } = usePlayer();
@@ -21,34 +24,30 @@ export function Search() {
       .catch(console.error);
   }, []);
 
-  // Debounced search logic
+  // Debounced search logic for initial results
   useEffect(() => {
     const trimmedQuery = searchQuery.trim();
     
-    console.group(`[Search] Flow: "${trimmedQuery}"`);
-    console.log(`Input Length: ${trimmedQuery.length}`);
-
     if (trimmedQuery.length < 2) {
-      console.log('Query too short, clearing results.');
       setSearchResults([]);
       setIsSearching(false);
-      console.groupEnd();
+      setPage(0);
+      setHasMore(true);
       return;
     }
 
     const timer = setTimeout(async () => {
       setIsSearching(true);
-      console.log(`Triggering API Search Music for: "${trimmedQuery}"`);
+      setPage(0); // Reset page on new query
       
       try {
-        const results = await api.searchMusic(trimmedQuery);
-        console.log(`Results received: ${results.length} songs found.`);
+        const results = await api.searchMusic(trimmedQuery, 0);
         setSearchResults(results);
+        setHasMore(results.length >= 20);
       } catch (err: any) {
         console.error("Search API Execution Failed:", err);
       } finally {
         setIsSearching(false);
-        console.groupEnd();
       }
     }, 500);
 
@@ -56,6 +55,28 @@ export function Search() {
       clearTimeout(timer);
     };
   }, [searchQuery]);
+
+  const handleLoadMore = async () => {
+    if (isLoadingMore || !hasMore) return;
+    
+    const nextPage = page + 1;
+    setIsLoadingMore(true);
+    
+    try {
+      const results = await api.searchMusic(searchQuery, nextPage);
+      if (results.length === 0) {
+        setHasMore(false);
+      } else {
+        setSearchResults(prev => [...prev, ...results]);
+        setPage(nextPage);
+        setHasMore(results.length >= 20);
+      }
+    } catch (err) {
+      console.error("Failed to load more results", err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   const filteredPlaylists = allPlaylists.filter((playlist) =>
     playlist.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -299,6 +320,25 @@ export function Search() {
                         </span>
                       </motion.div>
                     ))}
+                    
+                    {hasMore && searchResults.length >= 20 && (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        disabled={isLoadingMore}
+                        onClick={handleLoadMore}
+                        className="w-full mt-8 py-6 rounded-2xl bg-primary/10 hover:bg-primary/20 text-primary font-bold transition-all border border-primary/20 flex items-center justify-center gap-3 disabled:opacity-50"
+                      >
+                        {isLoadingMore ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Loading more...
+                          </>
+                        ) : (
+                          "Load more results"
+                        )}
+                      </motion.button>
+                    )}
                   </div>
                 </TabsContent>
 
