@@ -131,9 +131,9 @@ export const api = {
     }
   },
 
-  async searchMusic(query: string, page: number = 0) {
+  async searchMusic(query: string) {
     try {
-      const res = await safeFetch(`${API_URL}/music/search?q=${encodeURIComponent(query)}&page=${page}&limit=20`);
+      const res = await safeFetch(`${API_URL}/music/search?q=${encodeURIComponent(query)}`);
       return res.json();
     } catch {
       console.warn('[api] Backend unreachable, searching mock data locally');

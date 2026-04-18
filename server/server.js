@@ -96,19 +96,52 @@ app.get('/api/recently-played', async (req, res) => {
 app.get('/api/music/search', async (req, res) => {
   try {
     const query = req.query.q;
-    const page = req.query.page || 0;
-    const limit = req.query.limit || 20;
-
     if (!query) return res.json([]);
     
-    // JioSaavn provides full audio streaming urls & 500x500 album art
-    const response = await axios.get(`https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
-    const tracks = response.data.data.results || [];
+    console.log(`[Search] Performing Broad Search for: "${query}"`);
     
-    const formatted = tracks.map(formatJioSaavnTrack);
+    // 1. Primary search for full phrase
+    const primaryUrl = `https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=${encodeURIComponent(query)}&limit=40`;
+    let allTracks = [];
+    
+    const primaryResponse = await axios.get(primaryUrl);
+    if (primaryResponse.data?.data?.results) {
+      allTracks = [...primaryResponse.data.data.results];
+    }
+
+    // 2. Secondary keyword search if multi-word query
+    const words = query.trim().split(/\s+/).filter(w => w.length > 2);
+    if (words.length > 1) {
+      // Search for up to 3 individual words to boost variety
+      const keywordPromises = words.slice(0, 3).map(word => 
+        axios.get(`https://jiosaavn-api-privatecvc2.vercel.app/search/songs?query=${encodeURIComponent(word)}&limit=20`)
+             .catch(() => ({ data: { data: { results: [] } } }))
+      );
+      
+      const keywordResponses = await Promise.all(keywordPromises);
+      keywordResponses.forEach(response => {
+        if (response.data?.data?.results) {
+          allTracks = [...allTracks, ...response.data.data.results];
+        }
+      });
+    }
+
+    // 3. Deduplicate by ID
+    const seenIds = new Set();
+    const uniqueTracks = allTracks.filter(track => {
+      if (seenIds.has(track.id)) return false;
+      seenIds.add(track.id);
+      return true;
+    });
+
+    // 4. Format and cap at 80 for variety but performance
+    const formatted = uniqueTracks.slice(0, 80).map(formatJioSaavnTrack);
+    
+    console.log(`[Search] Found ${formatted.length} unique related songs.`);
     res.json(formatted);
   } catch (err) {
-     res.status(500).json({ error: err.message });
+    console.error(`[Search] Broad search failed:`, err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

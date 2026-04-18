@@ -11,9 +11,6 @@ export function Search() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Song[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
   const [allPlaylists, setAllPlaylists] = useState<Playlist[]>([]);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const { playSong, playPlaylist } = usePlayer();
@@ -31,23 +28,19 @@ export function Search() {
     if (trimmedQuery.length < 2) {
       setSearchResults([]);
       setIsSearching(false);
-      setPage(0);
-      setHasMore(true);
       return;
     }
 
     const timer = setTimeout(async () => {
       setIsSearching(true);
-      setPage(0); // Reset page on new query
       
       try {
-        const results = await api.searchMusic(trimmedQuery, 0);
-        // Deduplicate initial results
+        const results = await api.searchMusic(trimmedQuery);
+        // Secondary deduplication for UI safety
         const uniqueResults = results.filter((s: Song, index: number, self: Song[]) => 
           index === self.findIndex((t) => t.id === s.id)
         );
         setSearchResults(uniqueResults);
-        setHasMore(results.length >= 20);
       } catch (err: any) {
         console.error("Search API Execution Failed:", err);
       } finally {
@@ -59,33 +52,6 @@ export function Search() {
       clearTimeout(timer);
     };
   }, [searchQuery]);
-
-  const handleLoadMore = async () => {
-    if (isLoadingMore || !hasMore) return;
-    
-    const nextPage = page + 1;
-    setIsLoadingMore(true);
-    
-    try {
-      const results = await api.searchMusic(searchQuery, nextPage);
-      if (results.length === 0) {
-        setHasMore(false);
-      } else {
-        setSearchResults(prev => {
-          // Deduplicate by ID
-          const existingIds = new Set(prev.map(s => s.id));
-          const uniqueNewResults = results.filter((s: Song) => !existingIds.has(s.id));
-          return [...prev, ...uniqueNewResults];
-        });
-        setPage(nextPage);
-        setHasMore(results.length >= 20);
-      }
-    } catch (err) {
-      console.error("Failed to load more results", err);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  };
 
   const filteredPlaylists = allPlaylists.filter((playlist) =>
     playlist.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -206,7 +172,7 @@ export function Search() {
                     </div>
                     {searchResults.length > 0 ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {searchResults.slice(0, 20).map((song, index) => (
+                        {searchResults.slice(0, 30).map((song, index) => (
                           <motion.div
                             key={song.id + index}
                             initial={{ opacity: 0, x: -20 }}
@@ -239,20 +205,6 @@ export function Search() {
                       </div>
                     ) : !isSearching && (
                       <p className="text-muted-foreground/60 italic">Searching real-time music...</p>
-                    )}
-                    {searchResults.length > 20 && (
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                           const tabsList = document.querySelector('[role="tablist"]');
-                           const songsTab = tabsList?.querySelector('[data-value="songs"]') as HTMLElement;
-                           songsTab?.click();
-                        }}
-                        className="w-full mt-6 py-4 rounded-2xl bg-accent/30 hover:bg-accent/50 text-sm font-bold text-primary transition-all border border-dashed border-primary/20"
-                      >
-                        See all {searchResults.length} results
-                      </motion.button>
                     )}
                   </div>
 
@@ -329,25 +281,6 @@ export function Search() {
                         </span>
                       </motion.div>
                     ))}
-                    
-                    {hasMore && searchResults.length >= 20 && (
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        disabled={isLoadingMore}
-                        onClick={handleLoadMore}
-                        className="w-full mt-8 py-6 rounded-2xl bg-primary/10 hover:bg-primary/20 text-primary font-bold transition-all border border-primary/20 flex items-center justify-center gap-3 disabled:opacity-50"
-                      >
-                        {isLoadingMore ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            Loading more...
-                          </>
-                        ) : (
-                          "Load more results"
-                        )}
-                      </motion.button>
-                    )}
                   </div>
                 </TabsContent>
 
