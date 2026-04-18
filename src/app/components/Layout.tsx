@@ -5,10 +5,12 @@ import { QueuePanel } from "./QueuePanel";
 import { BottomNav } from "./BottomNav";
 import { UserProfile } from "./UserProfile";
 import { Toaster } from "./ui/sonner";
+import { AddToPlaylistDialog } from "./AddToPlaylistDialog";
 
 export function Layout() {
   return (
     <div className="h-screen w-full max-w-full bg-background text-foreground overflow-x-hidden overflow-y-auto flex transition-colors duration-300 relative">
+      <AddToPlaylistDialog />
       {/* Animated background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] animate-pulse" />

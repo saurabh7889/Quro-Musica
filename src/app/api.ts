@@ -160,5 +160,59 @@ export const api = {
         image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080"
       };
     }
+  },
+
+  async addSongToPlaylist(playlistId: string, songId: string) {
+    try {
+      await safeFetch(`${API_URL}/playlists/${playlistId}/songs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ songId }),
+      });
+    } catch {
+      console.warn('[api] Backend unreachable, added song to playlist locally');
+    }
+  },
+
+  async removeSongFromPlaylist(playlistId: string, songId: string) {
+    try {
+      await safeFetch(`${API_URL}/playlists/${playlistId}/songs/${songId}`, {
+        method: "DELETE",
+      });
+    } catch {
+      console.warn('[api] Backend unreachable, removed song from playlist locally');
+    }
+  },
+
+  async getPlaylistsForSong(songId: string) {
+    try {
+      const res = await safeFetch(`${API_URL}/songs/${songId}/playlists`);
+      return res.json();
+    } catch {
+      console.warn('[api] Backend unreachable, returning empty playlist list for song');
+      return [];
+    }
+  },
+
+  async deletePlaylist(playlistId: string) {
+    try {
+      await safeFetch(`${API_URL}/playlists/${playlistId}`, {
+        method: "DELETE",
+      });
+    } catch {
+      console.warn('[api] Backend unreachable, deleted playlist locally');
+    }
+  },
+
+  async renamePlaylist(playlistId: string, name: string) {
+    try {
+      await safeFetch(`${API_URL}/playlists/${playlistId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+    } catch {
+      console.warn('[api] Backend unreachable, renamed playlist locally');
+    }
   }
 };

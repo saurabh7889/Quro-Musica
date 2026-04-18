@@ -5,6 +5,8 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { api, Song, Playlist } from "../api";
 import { usePlayer } from "../context/PlayerContext";
+import { PlaylistDetail } from "./PlaylistDetail";
+import { PlaylistContextMenu } from "./PlaylistContextMenu";
 
 export function Library() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -12,8 +14,24 @@ export function Library() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [recentSongs, setRecentSongs] = useState<Song[]>([]);
   const [librarySearch, setLibrarySearch] = useState("");
+  const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number, y: number, playlistId: string } | null>(null);
   
-  const { playSong, playPlaylist, toggleLike, recentlyPlayed: realHistory } = usePlayer();
+  const { 
+    playSong, 
+    playPlaylist, 
+    toggleLike, 
+    recentlyPlayed: realHistory,
+    pinnedPlaylists,
+    togglePinPlaylist
+  } = usePlayer();
+
+  const fetchPlaylists = async () => {
+    try {
+      const pl = await api.getPlaylists();
+      setPlaylists(pl);
+    } catch(err) { console.error(err); }
+  };
 
   useEffect(() => {
     Promise.all([api.getPlaylists(), api.getSongs()])
@@ -40,13 +58,47 @@ export function Library() {
     s.artist.toLowerCase().includes(librarySearch.toLowerCase())
   );
 
+  const handleOpenPlaylist = (playlistId: string) => {
+    if (playlistId === 'liked') {
+      setSelectedPlaylist({
+        id: 'liked',
+        name: 'Liked Songs',
+        coverImage: 'https://images.unsplash.com/photo-1514525253361-bee8718a300c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+        songCount: likedSongs.length
+      });
+    } else {
+      const pl = playlists.find(p => p.id === playlistId);
+      if (pl) setSelectedPlaylist(pl);
+    }
+  };
+
+  const handleContextMenu = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY, playlistId: id });
+  };
+
+  const handleRename = async (id: string) => {
+    const newName = window.prompt("New Name:");
+    if (newName) {
+       await api.renamePlaylist(id, newName);
+       fetchPlaylists();
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Delete this playlist?")) {
+      await api.deletePlaylist(id);
+      fetchPlaylists();
+    }
+  };
+
   const handlePlayPlaylist = async (playlist: Playlist) => {
      // Play all liked songs if it's the Liked Songs playlist, else generic slice
-     if (playlist.name === "Liked Songs") {
+     if (playlist.id === 'liked') {
         playPlaylist(likedSongs);
      } else {
-        const plSongs = songs.slice(0, playlist.songCount);
-        playPlaylist(plSongs);
+        const fetchedSongs = await api.getSongs();
+        playPlaylist(fetchedSongs.slice(0, playlist.songCount));
      }
   };
 
@@ -149,7 +201,8 @@ export function Library() {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.05 }}
                       whileHover={{ scale: 1.05, y: -8 }}
-                      onClick={() => handlePlayPlaylist(playlist)}
+                      onClick={() => handleOpenPlaylist(playlist.id)}
+                      onContextMenu={(e) => handleContextMenu(e, playlist.id)}
                       className="group p-4 md:p-5 rounded-3xl bg-card/40 hover:bg-card/60 backdrop-blur-xl border border-border hover:border-primary/20 cursor-pointer transition-all shadow-lg hover:shadow-2xl relative"
                     >
                       {/* Play Overlay */}
@@ -184,7 +237,8 @@ export function Library() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
                       whileHover={{ scale: 1.01, x: 8 }}
-                      onClick={() => handlePlayPlaylist(playlist)}
+                      onClick={() => handleOpenPlaylist(playlist.id)}
+                      onContextMenu={(e) => handleContextMenu(e, playlist.id)}
                       className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
                     >
                       <div className="w-14 h-14 md:w-20 md:h-20 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
@@ -224,7 +278,9 @@ export function Library() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8 p-6 md:p-12 rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-purple-600/10 to-transparent border border-white/5 backdrop-blur-3xl relative overflow-hidden group/header"
+              onClick={() => handleOpenPlaylist('liked')}
+              onContextMenu={(e) => handleContextMenu(e, 'liked')}
+              className="mb-8 p-6 md:p-12 rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-purple-600/10 to-transparent border border-white/5 backdrop-blur-3xl relative overflow-hidden group/header cursor-pointer"
             >
               <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[100px] -translate-y-1/2 translate-x-1/2 rounded-full animate-pulse" />
               <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
@@ -345,6 +401,30 @@ export function Library() {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Playlist Detail Overlay */}
+        <AnimatePresence>
+          {selectedPlaylist && (
+            <PlaylistDetail 
+              playlist={selectedPlaylist} 
+              onBack={() => setSelectedPlaylist(null)} 
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Context Menu Overlay */}
+        {contextMenu && (
+          <PlaylistContextMenu 
+            x={contextMenu.x}
+            y={contextMenu.y}
+            playlistId={contextMenu.playlistId}
+            isPinned={pinnedPlaylists.includes(contextMenu.playlistId)}
+            onPinToggle={() => togglePinPlaylist(contextMenu.playlistId)}
+            onRename={() => handleRename(contextMenu.playlistId)}
+            onDelete={() => handleDelete(contextMenu.playlistId)}
+            onClose={() => setContextMenu(null)}
+          />
+        )}
       </div>
     </ScrollArea>
   );

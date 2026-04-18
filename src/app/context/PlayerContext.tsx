@@ -45,6 +45,15 @@ interface PlayerContextType {
   recentlyPlayed: Song[];
   isQueueVisible: boolean;
   toggleQueueVisible: () => void;
+  // Playlist Dialog
+  isAddPlaylistDialogOpen: boolean;
+  setIsAddPlaylistDialogOpen: (open: boolean) => void;
+  activeSongForPlaylist: Song | null;
+  setActiveSongForPlaylist: (song: Song | null) => void;
+  addSongToPlaylist: (songId: string, playlistId: string) => Promise<void>;
+  removeSongFromPlaylist: (songId: string, playlistId: string) => Promise<void>;
+  pinnedPlaylists: string[];
+  togglePinPlaylist: (playlistId: string) => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -70,8 +79,50 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     return saved ? JSON.parse(saved) : [];
   });
   const [isQueueVisible, setIsQueueVisible] = useState(false);
+  const [isAddPlaylistDialogOpen, setIsAddPlaylistDialogOpen] = useState(false);
+  const [activeSongForPlaylist, setActiveSongForPlaylist] = useState<Song | null>(null);
+  const [pinnedPlaylists, setPinnedPlaylists] = useState<string[]>(() => {
+    const saved = localStorage.getItem('quro_pinned_playlists');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('quro_pinned_playlists', JSON.stringify(pinnedPlaylists));
+  }, [pinnedPlaylists]);
+
+  const togglePinPlaylist = useCallback((id: string) => {
+    setPinnedPlaylists(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]);
+  }, []);
+
+  const addSongToPlaylist = async (songId: string, playlistId: string) => {
+     try {
+       if (playlistId === 'liked') {
+          await api.toggleLike(songId, true);
+          setAllSongs(prev => prev.map(s => s.id === songId ? { ...s, liked: true } : s));
+          if (currentSong?.id === songId) setCurrentSong({ ...currentSong, liked: true });
+       } else {
+          await api.addSongToPlaylist(playlistId, songId);
+       }
+     } catch (err) {
+       console.error("Failed to add song to playlist", err);
+     }
+  };
+
+  const removeSongFromPlaylist = async (songId: string, playlistId: string) => {
+    try {
+      if (playlistId === 'liked') {
+        await api.toggleLike(songId, false);
+        setAllSongs(prev => prev.map(s => s.id === songId ? { ...s, liked: false } : s));
+        if (currentSong?.id === songId) setCurrentSong({ ...currentSong, liked: false });
+      } else {
+        await api.removeSongFromPlaylist(playlistId, songId);
+      }
+    } catch (err) {
+      console.error("Failed to remove song from playlist", err);
+    }
+  };
 
   // Initialize audio element
   useEffect(() => {
@@ -274,19 +325,12 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggleLike = useCallback(async (songId: string) => {
-    try {
-      const isLiked = currentSong?.id === songId ? !currentSong.liked : false;
-      await api.toggleLike(songId, isLiked);
-      
-      if (currentSong && currentSong.id === songId) {
-        setCurrentSong({ ...currentSong, liked: isLiked });
-      }
-      setQueue(prev => prev.map(s => s.id === songId ? { ...s, liked: isLiked } : s));
-      setAllSongs(prev => prev.map(s => s.id === songId ? { ...s, liked: isLiked} : s));
-    } catch(err) {
-      console.error("Failed to toggle like", err);
+    const song = allSongs.find(s => s.id === songId);
+    if (song) {
+      setActiveSongForPlaylist(song);
+      setIsAddPlaylistDialogOpen(true);
     }
-  }, [currentSong]);
+  }, [allSongs]);
 
   const toggleShuffle = useCallback(() => setIsShuffle(prev => !prev), []);
   const toggleRepeat = useCallback(() => setRepeatMode(prev => (prev + 1) % 3), []);
@@ -320,7 +364,15 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         addToQueue,
         recentlyPlayed,
         isQueueVisible,
-        toggleQueueVisible
+        toggleQueueVisible,
+        isAddPlaylistDialogOpen,
+        setIsAddPlaylistDialogOpen,
+        activeSongForPlaylist,
+        setActiveSongForPlaylist,
+        addSongToPlaylist,
+        removeSongFromPlaylist,
+        pinnedPlaylists,
+        togglePinPlaylist
       }}
     >
       {children}

@@ -1,13 +1,12 @@
-import { Home, Search, Library, Plus, Heart } from "lucide-react";
-import { Link, useLocation } from "react-router";
-import { motion } from "motion/react";
-import { useState, useEffect } from "react";
-import { api, Playlist } from "../api";
-import { ScrollArea } from "./ui/scroll-area";
+import { usePlayer } from "../context/PlayerContext";
+import { PlaylistContextMenu } from "./PlaylistContextMenu";
 
 export function Sidebar() {
   const location = useLocation();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [contextMenu, setContextMenu] = useState<{ x: number, y: number, playlistId: string } | null>(null);
+
+  const { pinnedPlaylists, togglePinPlaylist } = usePlayer();
 
   const fetchPlaylists = async () => {
     try {
@@ -27,7 +26,12 @@ export function Sidebar() {
     if (!name) return;
     
     await api.createPlaylist(name);
-    fetchPlaylists(); // Refresh list after creation
+    fetchPlaylists();
+  };
+
+  const handleContextMenu = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY, playlistId: id });
   };
 
   const navItems = [
@@ -39,7 +43,7 @@ export function Sidebar() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="w-64 h-screen bg-background/40 backdrop-blur-xl border-r border-border flex flex-col">
+    <div className="w-64 h-screen bg-background/40 backdrop-blur-xl border-r border-border flex flex-col relative">
       {/* Logo */}
       <div className="p-6 pb-4">
         <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
@@ -77,6 +81,8 @@ export function Sidebar() {
           <motion.div
             whileHover={{ scale: 1.02, x: 4 }}
             whileTap={{ scale: 0.98 }}
+            onClick={() => window.location.hash = "/library"} // Basic hash routing or similar if needed, for now just ui
+            onContextMenu={(e) => handleContextMenu(e, 'liked')}
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer transition-all group"
           >
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg group-hover:shadow-purple-500/50 transition-shadow">
@@ -84,8 +90,8 @@ export function Sidebar() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm truncate uppercase tracking-tight">Liked Songs</p>
-              <p className="text-xs text-muted-foreground/60">
-                Playlists songs
+              <p className="text-xs text-muted-foreground/60 flex items-center gap-1">
+                 Playlist
               </p>
             </div>
           </motion.div>
@@ -98,6 +104,7 @@ export function Sidebar() {
               key={playlist.id}
               whileHover={{ scale: 1.02, x: 4 }}
               whileTap={{ scale: 0.98 }}
+              onContextMenu={(e) => handleContextMenu(e, playlist.id)}
               className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer transition-all group"
             >
               <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
@@ -110,7 +117,7 @@ export function Sidebar() {
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-sm truncate">{playlist.name}</p>
                 <p className="text-xs text-muted-foreground/60">
-                  {playlist.songCount} songs
+                   Playlist
                 </p>
               </div>
             </motion.div>
@@ -130,6 +137,25 @@ export function Sidebar() {
           </motion.div>
         </div>
       </ScrollArea>
+
+      {/* Context Menu Overlay */}
+      {contextMenu && (
+        <PlaylistContextMenu 
+          x={contextMenu.x}
+          y={contextMenu.y}
+          playlistId={contextMenu.playlistId}
+          isPinned={pinnedPlaylists.includes(contextMenu.playlistId)}
+          onPinToggle={() => togglePinPlaylist(contextMenu.playlistId)}
+          onClose={() => setContextMenu(null)}
+          onRename={() => {
+            const n = window.prompt("New Name:");
+            if(n) { api.renamePlaylist(contextMenu.playlistId, n).then(() => fetchPlaylists()); }
+          }}
+          onDelete={() => {
+            if(window.confirm("Delete?")) { api.deletePlaylist(contextMenu.playlistId).then(() => fetchPlaylists()); }
+          }}
+        />
+      )}
 
       {/* Footer */}
       <div className="p-4 border-t border-border">
