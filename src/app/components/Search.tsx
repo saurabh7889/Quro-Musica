@@ -42,7 +42,11 @@ export function Search() {
       
       try {
         const results = await api.searchMusic(trimmedQuery, 0);
-        setSearchResults(results);
+        // Deduplicate initial results
+        const uniqueResults = results.filter((s: Song, index: number, self: Song[]) => 
+          index === self.findIndex((t) => t.id === s.id)
+        );
+        setSearchResults(uniqueResults);
         setHasMore(results.length >= 20);
       } catch (err: any) {
         console.error("Search API Execution Failed:", err);
@@ -67,7 +71,12 @@ export function Search() {
       if (results.length === 0) {
         setHasMore(false);
       } else {
-        setSearchResults(prev => [...prev, ...results]);
+        setSearchResults(prev => {
+          // Deduplicate by ID
+          const existingIds = new Set(prev.map(s => s.id));
+          const uniqueNewResults = results.filter((s: Song) => !existingIds.has(s.id));
+          return [...prev, ...uniqueNewResults];
+        });
         setPage(nextPage);
         setHasMore(results.length >= 20);
       }
