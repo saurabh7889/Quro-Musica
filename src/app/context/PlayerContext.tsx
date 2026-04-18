@@ -325,12 +325,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggleLike = useCallback(async (songId: string) => {
-    const song = allSongs.find(s => s.id === songId);
+    let song = allSongs.find(s => s.id === songId);
+    if (!song && currentSong?.id === songId) song = currentSong;
+    
     if (song) {
       setActiveSongForPlaylist(song);
       setIsAddPlaylistDialogOpen(true);
     }
-  }, [allSongs]);
+  }, [allSongs, currentSong]);
 
   const toggleShuffle = useCallback(() => setIsShuffle(prev => !prev), []);
   const toggleRepeat = useCallback(() => setRepeatMode(prev => (prev + 1) % 3), []);

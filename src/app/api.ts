@@ -62,14 +62,24 @@ export const api = {
   async getPlaylists() {
     try {
       const res = await safeFetch(`${API_URL}/playlists`);
-      return res.json();
+      const remote = await res.json();
+      const local = JSON.parse(localStorage.getItem('quro_local_playlists') || '[]');
+      return [...remote, ...local];
     } catch {
-      console.warn('[api] Backend unreachable, using mock playlists');
-      return mockPlaylists;
+      console.warn('[api] Backend unreachable, using combined mock and local playlists');
+      const local = JSON.parse(localStorage.getItem('quro_local_playlists') || '[]');
+      return [...mockPlaylists, ...local];
     }
   },
 
   async createPlaylist(name: string) {
+    const newPl: Playlist = { 
+      id: "pl_" + Date.now(), 
+      name, 
+      coverImage: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080", 
+      songCount: 0 
+    };
+    
     try {
       const res = await safeFetch(`${API_URL}/playlists`, {
         method: 'POST',
@@ -78,8 +88,10 @@ export const api = {
       });
       return res.json();
     } catch {
-      console.warn('[api] Backend unreachable, returning mock');
-      return { id: "pl_" + Date.now(), name, coverImage: "", songCount: 0 };
+      console.warn('[api] Backend unreachable, saving playlist locally');
+      const local = JSON.parse(localStorage.getItem('quro_local_playlists') || '[]');
+      localStorage.setItem('quro_local_playlists', JSON.stringify([...local, newPl]));
+      return newPl;
     }
   },
 
@@ -94,6 +106,16 @@ export const api = {
   },
 
   async toggleLike(songId: string, liked: boolean) {
+    // Sync Liked Songs list locally
+    const likedSongs = JSON.parse(localStorage.getItem('quro_liked_songs') || '[]');
+    if (liked) {
+      if (!likedSongs.includes(songId)) likedSongs.push(songId);
+    } else {
+      const filtered = likedSongs.filter((id: string) => id !== songId);
+      localStorage.setItem('quro_liked_songs', JSON.stringify(filtered));
+    }
+    localStorage.setItem('quro_liked_songs', JSON.stringify(likedSongs));
+
     try {
       const res = await safeFetch(`${API_URL}/songs/${songId}/like`, {
         method: 'POST',
@@ -163,6 +185,12 @@ export const api = {
   },
 
   async addSongToPlaylist(playlistId: string, songId: string) {
+    // Persist mapping locally
+    const mappings = JSON.parse(localStorage.getItem('quro_playlist_songs') || '{}');
+    if (!mappings[playlistId]) mappings[playlistId] = [];
+    if (!mappings[playlistId].includes(songId)) mappings[playlistId].push(songId);
+    localStorage.setItem('quro_playlist_songs', JSON.stringify(mappings));
+
     try {
       await safeFetch(`${API_URL}/playlists/${playlistId}/songs`, {
         method: "POST",
@@ -175,6 +203,12 @@ export const api = {
   },
 
   async removeSongFromPlaylist(playlistId: string, songId: string) {
+    const mappings = JSON.parse(localStorage.getItem('quro_playlist_songs') || '{}');
+    if (mappings[playlistId]) {
+      mappings[playlistId] = mappings[playlistId].filter((id: string) => id !== songId);
+      localStorage.setItem('quro_playlist_songs', JSON.stringify(mappings));
+    }
+
     try {
       await safeFetch(`${API_URL}/playlists/${playlistId}/songs/${songId}`, {
         method: "DELETE",
@@ -189,12 +223,27 @@ export const api = {
       const res = await safeFetch(`${API_URL}/songs/${songId}/playlists`);
       return res.json();
     } catch {
-      console.warn('[api] Backend unreachable, returning empty playlist list for song');
-      return [];
+      console.warn('[api] Backend unreachable, check local mappings');
+      const mappings = JSON.parse(localStorage.getItem('quro_playlist_songs') || '{}');
+      const likedSongs = JSON.parse(localStorage.getItem('quro_liked_songs') || '[]');
+      
+      const songPlaylists = Object.keys(mappings)
+        .filter(plId => mappings[plId].includes(songId))
+        .map(plId => ({ id: plId }));
+        
+      if (likedSongs.includes(songId)) songPlaylists.push({ id: 'liked' });
+      return songPlaylists;
     }
   },
 
   async deletePlaylist(playlistId: string) {
+    const local = JSON.parse(localStorage.getItem('quro_local_playlists') || '[]');
+    localStorage.setItem('quro_local_playlists', JSON.stringify(local.filter((p: any) => p.id !== playlistId)));
+    
+    const mappings = JSON.parse(localStorage.getItem('quro_playlist_songs') || '{}');
+    delete mappings[playlistId];
+    localStorage.setItem('quro_playlist_songs', JSON.stringify(mappings));
+
     try {
       await safeFetch(`${API_URL}/playlists/${playlistId}`, {
         method: "DELETE",
@@ -205,6 +254,9 @@ export const api = {
   },
 
   async renamePlaylist(playlistId: string, name: string) {
+    const local = JSON.parse(localStorage.getItem('quro_local_playlists') || '[]');
+    localStorage.setItem('quro_local_playlists', JSON.stringify(local.map((p: any) => p.id === playlistId ? { ...p, name } : p)));
+
     try {
       await safeFetch(`${API_URL}/playlists/${playlistId}`, {
         method: "PATCH",
@@ -214,5 +266,18 @@ export const api = {
     } catch {
       console.warn('[api] Backend unreachable, renamed playlist locally');
     }
+  },
+
+  async getSongsByPlaylist(playlistId: string) {
+    const all = await this.getSongs();
+    const likedSongs = JSON.parse(localStorage.getItem('quro_liked_songs') || '[]');
+    
+    if (playlistId === 'liked') {
+       return all.filter(s => s.liked || likedSongs.includes(s.id));
+    }
+    
+    const mappings = JSON.parse(localStorage.getItem('quro_playlist_songs') || '{}');
+    const songIds = mappings[playlistId] || [];
+    return all.filter(s => songIds.includes(s.id));
   }
 };

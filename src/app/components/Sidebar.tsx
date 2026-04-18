@@ -1,5 +1,5 @@
 import { Home, Search, Library, Plus, Heart } from "lucide-react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 import { api, Playlist } from "../api";
@@ -9,6 +9,7 @@ import { PlaylistContextMenu } from "./PlaylistContextMenu";
 
 export function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [contextMenu, setContextMenu] = useState<{ x: number, y: number, playlistId: string } | null>(null);
 
@@ -87,7 +88,7 @@ export function Sidebar() {
           <motion.div
             whileHover={{ scale: 1.02, x: 4 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => window.location.hash = "/library"} // Basic hash routing or similar if needed, for now just ui
+            onClick={() => navigate("/library", { state: { openPlaylist: 'liked' } })}
             onContextMenu={(e) => handleContextMenu(e, 'liked')}
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer transition-all group"
           >
@@ -110,6 +111,7 @@ export function Sidebar() {
               key={playlist.id}
               whileHover={{ scale: 1.02, x: 4 }}
               whileTap={{ scale: 0.98 }}
+              onClick={() => navigate("/library", { state: { openPlaylist: playlist.id } })}
               onContextMenu={(e) => handleContextMenu(e, playlist.id)}
               className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent cursor-pointer transition-all group"
             >

@@ -7,9 +7,19 @@ import { api, Song, Playlist } from "../api";
 import { usePlayer } from "../context/PlayerContext";
 import { PlaylistDetail } from "./PlaylistDetail";
 import { PlaylistContextMenu } from "./PlaylistContextMenu";
+import { useLocation } from "react-router";
 
 export function Library() {
+  const location = useLocation();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  // ... (existing states)
+  
+  // Auto-open playlist from navigation state
+  useEffect(() => {
+    if (location.state?.openPlaylist && playlists.length > 0) {
+      handleOpenPlaylist(location.state.openPlaylist);
+    }
+  }, [location.state, playlists]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [songs, setSongs] = useState<Song[]>([]);
   const [recentSongs, setRecentSongs] = useState<Song[]>([]);
@@ -103,9 +113,10 @@ export function Library() {
   };
 
   return (
-    <ScrollArea className="h-full transition-colors duration-300">
-      <div className="p-4 md:p-8 pb-32">
-        {/* Header */}
+    <div className="flex-1 relative overflow-hidden h-full">
+      <ScrollArea className="h-full transition-colors duration-300">
+        <div className="p-4 md:p-8 pb-32">
+          {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -401,31 +412,32 @@ export function Library() {
             )}
           </TabsContent>
         </Tabs>
-
-        {/* Playlist Detail Overlay */}
-        <AnimatePresence>
-          {selectedPlaylist && (
-            <PlaylistDetail 
-              playlist={selectedPlaylist} 
-              onBack={() => setSelectedPlaylist(null)} 
-            />
-          )}
-        </AnimatePresence>
-
-        {/* Context Menu Overlay */}
-        {contextMenu && (
-          <PlaylistContextMenu 
-            x={contextMenu.x}
-            y={contextMenu.y}
-            playlistId={contextMenu.playlistId}
-            isPinned={pinnedPlaylists.includes(contextMenu.playlistId)}
-            onPinToggle={() => togglePinPlaylist(contextMenu.playlistId)}
-            onRename={() => handleRename(contextMenu.playlistId)}
-            onDelete={() => handleDelete(contextMenu.playlistId)}
-            onClose={() => setContextMenu(null)}
-          />
-        )}
       </div>
     </ScrollArea>
-  );
+
+    {/* Playlist Detail Overlay */}
+    <AnimatePresence>
+      {selectedPlaylist && (
+        <PlaylistDetail 
+          playlist={selectedPlaylist} 
+          onBack={() => setSelectedPlaylist(null)} 
+        />
+      )}
+    </AnimatePresence>
+
+    {/* Context Menu Overlay */}
+    {contextMenu && (
+      <PlaylistContextMenu 
+        x={contextMenu.x}
+        y={contextMenu.y}
+        playlistId={contextMenu.playlistId}
+        isPinned={pinnedPlaylists.includes(contextMenu.playlistId)}
+        onPinToggle={() => togglePinPlaylist(contextMenu.playlistId)}
+        onRename={() => handleRename(contextMenu.playlistId)}
+        onDelete={() => handleDelete(contextMenu.playlistId)}
+        onClose={() => setContextMenu(null)}
+      />
+    )}
+  </div>
+);
 }

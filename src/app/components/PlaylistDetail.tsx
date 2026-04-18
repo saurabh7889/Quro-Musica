@@ -32,12 +32,14 @@ export function PlaylistDetail({ playlist, onBack }: Props) {
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
-    // Load playlist songs
-    api.getSongs().then(all => {
-      // Mock filter for now
-      setSongs(all.slice(0, playlist.songCount));
-      // Load recommendations
-      setRecommended(all.slice(playlist.songCount + 1, playlist.songCount + 6));
+    // Load playlist songs from persistence
+    api.getSongsByPlaylist(playlist.id).then(playlistSongs => {
+      setSongs(playlistSongs);
+      
+      // Load recommendations (different from current songs)
+      api.getSongs().then(all => {
+        setRecommended(all.filter(s => !playlistSongs.map(ps => ps.id).includes(s.id)).slice(0, 5));
+      });
     });
   }, [playlist]);
 
@@ -55,7 +57,7 @@ export function PlaylistDetail({ playlist, onBack }: Props) {
       } finally {
         setIsSearching(false);
       }
-    }, 400);
+    }, 250);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
