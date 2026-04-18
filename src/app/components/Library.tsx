@@ -171,11 +171,9 @@ export function Library() {
               </TabsList>
             </div>
 
-          {/* Playlists Tab */}
-          <TabsContent value="playlists">
+          <TabsContent value="playlists" className="mt-0 outline-none">
             {filteredPlaylists.length > 0 ? (
-              <TabsContent value="playlists" className="mt-0 outline-none">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-8 min-h-[400px]">
+               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-8 min-h-[400px]">
                   {filteredPlaylists.map((playlist, index) => (
                     <motion.div
                       key={playlist.id}
@@ -209,42 +207,7 @@ export function Library() {
                       </p>
                     </motion.div>
                   ))}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {filteredPlaylists.map((playlist, index) => (
-                    <motion.div
-                      key={playlist.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      whileHover={{ scale: 1.01, x: 8 }}
-                      onClick={() => handleOpenPlaylist(playlist.id)}
-                      onContextMenu={(e) => handleContextMenu(e, playlist.id)}
-                      className="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl bg-card/20 hover:bg-card/40 border border-transparent hover:border-primary/20 cursor-pointer group transition-all"
-                    >
-                      <div className="w-14 h-14 md:w-20 md:h-20 rounded-xl overflow-hidden flex-shrink-0 shadow-lg">
-                        <img
-                          src={playlist.coverImage}
-                          alt={playlist.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-foreground text-sm md:text-lg truncate">
-                          {playlist.name}
-                        </p>
-                        <p className="text-xs md:text-sm text-muted-foreground font-medium truncate">
-                          {playlist.description || `${playlist.songCount} songs`}
-                        </p>
-                      </div>
-                      <span className="text-xs font-bold text-muted-foreground/40 group-hover:text-primary transition-colors pr-4">
-                        {playlist.songCount} songs
-                      </span>
-                    </motion.div>
-                  ))}
-                </div>
-              )
+               </div>
             ) : (
               <div className="text-center py-24 bg-card/10 rounded-[3rem] border border-dashed border-border">
                   <Music className="w-16 h-16 text-muted-foreground/20 mx-auto mb-4" />
