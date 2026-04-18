@@ -60,15 +60,22 @@ export const api = {
   },
 
   async getPlaylists() {
+    const mappings = JSON.parse(localStorage.getItem('quro_playlist_songs') || '{}');
+    const updateCount = (pl: Playlist) => {
+       const count = mappings[pl.id]?.length || (pl.id === 'liked' ? 0 : pl.songCount);
+       return { ...pl, songCount: count };
+    };
+
     try {
       const res = await safeFetch(`${API_URL}/playlists`);
-      const remote = await res.json();
-      const local = JSON.parse(localStorage.getItem('quro_local_playlists') || '[]');
+      const remote = (await res.json()).map(updateCount);
+      const local = JSON.parse(localStorage.getItem('quro_local_playlists') || '[]').map(updateCount);
       return [...remote, ...local];
     } catch {
       console.warn('[api] Backend unreachable, using combined mock and local playlists');
-      const local = JSON.parse(localStorage.getItem('quro_local_playlists') || '[]');
-      return [...mockPlaylists, ...local];
+      const local = JSON.parse(localStorage.getItem('quro_local_playlists') || '[]').map(updateCount);
+      const mock = mockPlaylists.map(updateCount);
+      return [...mock, ...local];
     }
   },
 
@@ -107,12 +114,11 @@ export const api = {
 
   async toggleLike(songId: string, liked: boolean) {
     // Sync Liked Songs list locally
-    const likedSongs = JSON.parse(localStorage.getItem('quro_liked_songs') || '[]');
+    let likedSongs = JSON.parse(localStorage.getItem('quro_liked_songs') || '[]');
     if (liked) {
       if (!likedSongs.includes(songId)) likedSongs.push(songId);
     } else {
-      const filtered = likedSongs.filter((id: string) => id !== songId);
-      localStorage.setItem('quro_liked_songs', JSON.stringify(filtered));
+      likedSongs = likedSongs.filter((id: string) => id !== songId);
     }
     localStorage.setItem('quro_liked_songs', JSON.stringify(likedSongs));
 
