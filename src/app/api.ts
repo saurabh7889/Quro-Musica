@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { mockSongs, mockPlaylists, recentlyPlayed } from './data/mockData';
+import { mockSongs, mockPlaylists, recentlyPlayed, Playlist, Song } from './data/mockData';
 
 // Use environment variable for production, default to Render backend
 const API_URL = import.meta.env.VITE_API_URL || 'https://quromusic.onrender.com/api';
@@ -275,15 +275,15 @@ export const api = {
   },
 
   async getSongsByPlaylist(playlistId: string) {
-    const all = await this.getSongs();
+    const all: Song[] = await this.getSongs();
     const likedSongs = JSON.parse(localStorage.getItem('quro_liked_songs') || '[]');
     
     if (playlistId === 'liked') {
-       return all.filter(s => s.liked || likedSongs.includes(s.id));
+       return all.filter((s: Song) => s.liked || likedSongs.includes(s.id));
     }
     
     const mappings = JSON.parse(localStorage.getItem('quro_playlist_songs') || '{}');
     const songIds = mappings[playlistId] || [];
-    return all.filter(s => songIds.includes(s.id));
+    return all.filter((s: Song) => songIds.includes(s.id));
   }
 };
